@@ -1,0 +1,17 @@
+{
+    "name": "MultiplayerProtocol",
+    "rootNamespace": "MultiplayerProtocol",
+    "references": [
+        "Essentials",
+        "RSG.Promise"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
