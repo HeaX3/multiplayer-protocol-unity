@@ -1,37 +1,38 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerProtocol
 {
-    public interface INetworkMessageHandler
+    public interface INetworkMessageHandler : INetworkMessageListener
     {
-        string messageId { get; }
-        Type messageType { get; }
-        INetworkMessage CreateMessageInstance();
+        void Handle(INetworkMessage message, SerializedMessage serializedMessage) => Handle(message);
         void Handle(INetworkMessage message);
     }
 
-    public interface INetworkMessageHandler<in T> : INetworkMessageHandler where T : INetworkMessage, new()
+    public interface INetworkMessageHandler<in T> : INetworkMessageHandler, INetworkMessageListener<T> where T : INetworkMessage, new()
     {
-        string INetworkMessageHandler.messageId => typeof(T).FullName;
-        Type INetworkMessageHandler.messageType => typeof(T);
-
-        INetworkMessage INetworkMessageHandler.CreateMessageInstance()
+        void INetworkMessageHandler.Handle(INetworkMessage message, SerializedMessage serializedMessage)
         {
-            return new T();
-        }
-
-        void INetworkMessageHandler.Handle(INetworkMessage message)
-        {
-            if (message is not T)
+            if (message is not T t)
             {
                 Debug.LogError(GetType().Name + " cannot handle message of type " + message.GetType().Name);
                 return;
             }
 
-            Handle(message);
+            Handle(t, serializedMessage);
         }
 
+        void INetworkMessageHandler.Handle(INetworkMessage message)
+        {
+            if (message is not T t)
+            {
+                Debug.LogError(GetType().Name + " cannot handle message of type " + message.GetType().Name);
+                return;
+            }
+
+            Handle(t);
+        }
+
+        void Handle(T message, SerializedMessage serializedMessage) => Handle(message);
         void Handle(T message);
     }
 }

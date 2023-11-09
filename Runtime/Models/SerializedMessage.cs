@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace MultiplayerProtocol
 {
-    public class SerializedMessage : IDisposable
+    public sealed class SerializedMessage : IDisposable
     {
         private List<byte> _buffer;
         private byte[] _readableBuffer;
@@ -426,7 +426,7 @@ namespace MultiplayerProtocol
 
         private bool _disposed = false;
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposed)
             {
@@ -444,7 +444,6 @@ namespace MultiplayerProtocol
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

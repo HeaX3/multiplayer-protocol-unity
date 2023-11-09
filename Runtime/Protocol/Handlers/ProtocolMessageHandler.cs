@@ -2,10 +2,8 @@
 
 namespace MultiplayerProtocol
 {
-    public class ProtocolMessageHandler : INetworkMessageHandler<ProtocolMessage>
+    public class ProtocolMessageHandler : INetworkMessageListener<ProtocolMessage>
     {
-        public string messageId => "__protocol__";
-
         private Protocol protocol { get; }
 
         internal ProtocolMessageHandler(Protocol protocol)

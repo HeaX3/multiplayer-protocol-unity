@@ -10,16 +10,21 @@ namespace MultiplayerProtocol
     public sealed class Protocol
     {
         private readonly Dictionary<Type, ushort> idMap = new();
-        private readonly Dictionary<ushort, INetworkMessageHandler> handlers = new();
-        private readonly Dictionary<INetworkMessageHandler, ushort> handlerIdMap = new();
+        private readonly Dictionary<ushort, INetworkMessageListener> handlers = new();
+        private readonly Dictionary<INetworkMessageListener, ushort> handlerIdMap = new();
 
-        public Protocol(params INetworkMessageHandler[] handlers) : this((IEnumerable<INetworkMessageHandler>)handlers)
+        private readonly Dictionary<Guid, ResponseListener> responseListeners = new();
+
+        public Protocol(params INetworkMessageListener[] handlers) : this(
+            (IEnumerable<INetworkMessageListener>)handlers)
         {
         }
 
-        public Protocol(IEnumerable<INetworkMessageHandler> handlers)
+        public Protocol(IEnumerable<INetworkMessageListener> handlers)
         {
             var list = handlers.ToList();
+            list.Insert(0, new RequestMessageHandler(this));
+            list.Insert(0, new ResponseMessageHandler(this));
             list.Insert(0, new ProtocolMessageHandler(this));
             for (var i = 0; i < list.Count; i++)
             {
@@ -31,7 +36,35 @@ namespace MultiplayerProtocol
             }
         }
 
+        internal void Reset()
+        {
+            responseListeners.Clear();
+        }
+
+        internal bool TryGetMessageId(Type type, out ushort messageId) => idMap.TryGetValue(type, out messageId);
+
         public ProtocolMessage CreateProtocolMessage() => new(this);
+
+        internal void AddResponseListener(Guid requestId, uint timeoutMs, Action<IRequestResponse> callback)
+        {
+            responseListeners[requestId] = new ResponseListener(callback, DateTime.UtcNow.AddMilliseconds(timeoutMs));
+        }
+
+        internal void RemoveResponseListener(Guid requestId)
+        {
+            responseListeners.Remove(requestId);
+        }
+
+        internal bool TryGetAndRemoveResponseListener(Guid requestId, out ResponseListener listener)
+        {
+            if (!responseListeners.TryGetValue(requestId, out listener))
+            {
+                return false;
+            }
+
+            responseListeners.Remove(requestId);
+            return true;
+        }
 
         internal JObject ToJson()
         {
@@ -56,6 +89,32 @@ namespace MultiplayerProtocol
             }
         }
 
+        public void Handle(SerializedMessage serializedMessage)
+        {
+            INetworkMessage message;
+            INetworkMessageListener handler;
+            try
+            {
+                message = Deserialize(serializedMessage, out handler);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed parsing serialized message:");
+                Debug.LogError(e);
+                return;
+            }
+
+            if (handler is INetworkMessageHandler simpleHandler)
+            {
+                simpleHandler.Handle(message, serializedMessage);
+            }
+            else
+            {
+                throw new InvalidOperationException("Handler " + handler.GetType().Name +
+                                                    " expects a request but received a flat message instead!");
+            }
+        }
+
         public SerializedMessage Serialize(INetworkMessage message)
         {
             if (!idMap.TryGetValue(message.GetType(), out var messageId))
@@ -72,27 +131,15 @@ namespace MultiplayerProtocol
             return result;
         }
 
-        public void Handle(SerializedMessage serializedMessage)
-        {
-            INetworkMessage message;
-            INetworkMessageHandler handler;
-            try
-            {
-                message = Deserialize(serializedMessage, out handler);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Failed parsing serialized message:");
-                Debug.LogError(e);
-                return;
-            }
-
-            handler.Handle(message);
-        }
-
-        private INetworkMessage Deserialize(SerializedMessage message, out INetworkMessageHandler handler)
+        internal INetworkMessage Deserialize(SerializedMessage message, out INetworkMessageListener handler)
         {
             var typeId = message.ReadUShort();
+            return Deserialize(message, typeId, out handler);
+        }
+
+        internal INetworkMessage Deserialize(SerializedMessage message, ushort typeId,
+            out INetworkMessageListener handler)
+        {
             if (!handlers.TryGetValue(typeId, out handler))
             {
                 throw new InvalidOperationException("Unknown message type " + typeId);
@@ -101,6 +148,34 @@ namespace MultiplayerProtocol
             var result = handler.CreateMessageInstance();
             foreach (var value in result.values) value.DeserializeFrom(message);
             return result;
+        }
+
+        internal class ResponseListener
+        {
+            private Action<IRequestResponse> callback { get; }
+            public DateTime timeout { get; }
+
+            private bool received;
+
+            public ResponseListener(Action<IRequestResponse> callback, DateTime timeout)
+            {
+                this.callback = callback;
+                this.timeout = timeout;
+            }
+
+            public void Receive(IRequestResponse response)
+            {
+                if (received) throw new InvalidOperationException("Response already received");
+                received = true;
+
+                if (DateTime.UtcNow > timeout)
+                {
+                    callback(RequestResponse.RequestTimeout());
+                    return;
+                }
+
+                callback(response);
+            }
         }
     }
 }
