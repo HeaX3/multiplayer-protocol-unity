@@ -13,6 +13,7 @@ namespace MultiplayerProtocol
 
     public interface INetworkMessageHandler<in T> : INetworkMessageHandler where T : INetworkMessage, new()
     {
+        string INetworkMessageHandler.messageId => typeof(T).FullName;
         Type INetworkMessageHandler.messageType => typeof(T);
 
         INetworkMessage INetworkMessageHandler.CreateMessageInstance()
