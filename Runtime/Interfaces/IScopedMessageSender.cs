@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace MultiplayerProtocol.Senders
+namespace MultiplayerProtocol
 {
     /// <summary>
     /// Message sender that sends messages to multiple connections
     /// </summary>
-    public interface ScopedMessageSender
+    public interface IScopedMessageSender
     {
         IEnumerable<NetworkConnection> GetConnections();
         
