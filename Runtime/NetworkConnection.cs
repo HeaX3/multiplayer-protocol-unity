@@ -59,11 +59,42 @@ namespace MultiplayerProtocol
             });
         }
 
+        /// <summary>
+        /// Serialize the network message and then send it
+        /// </summary>
+        /// <param name="message">Unserialized message</param>
         public void Send([NotNull] INetworkMessage message)
         {
             Send(protocol.Serialize(message));
         }
 
+        /// <summary>
+        /// Send an already serialized message, but first mark it with the appropriate message id. In order for this
+        /// to work, the message must not yet contain a message id.
+        ///
+        /// This is useful if a message is sent to multiple recipients since the message only needs to be serialized once,
+        /// but it can still be marked with a variable message id depending on the agreed upon protocol between the
+        /// server and the client for each connection.
+        /// </summary>
+        /// <param name="type">Message type</param>
+        /// <param name="message">Serialized message</param>
+        /// <exception cref="InvalidOperationException">Thrown if the recipient cannot handle the provided message type</exception>
+        public void Send([NotNull] Type type, [NotNull] SerializedMessage message)
+        {
+            if (!protocol.TryGetPartnerMessageId(type, out var messageId))
+            {
+                throw new InvalidOperationException("Recipient cannot handle message of type " + type.Name);
+            }
+
+            message.InsertInt(messageId);
+            Send(message);
+        }
+
+        /// <summary>
+        /// Send an already serialized message. In order for this to work, the message must be marked with a
+        /// message type id that the recipient understands.
+        /// </summary>
+        /// <param name="message">Serialized message preceded by the message id</param>
         public void Send([NotNull] SerializedMessage message)
         {
             endpoint.Send(message);
