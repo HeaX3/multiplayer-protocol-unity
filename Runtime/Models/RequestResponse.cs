@@ -60,19 +60,9 @@ namespace MultiplayerProtocol
             return $"{nameof(status)}: {status}\n{nameof(message)}: {message.UnreadLength()} bytes";
         }
 
-        public static RequestResponse Ok(JArray json)
+        public static RequestResponse Ok(ISerializableValue value = null)
         {
-            return new RequestResponse();
-        }
-
-        public static RequestResponse Ok(JObject json)
-        {
-            return new RequestResponse();
-        }
-
-        public static RequestResponse Ok(string body = null)
-        {
-            return new RequestResponse();
+            return new RequestResponse(value);
         }
 
         public static RequestResponse BadRequest(string body = null)
