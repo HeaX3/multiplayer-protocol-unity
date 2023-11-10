@@ -4,7 +4,17 @@
     {
         protected NetworkConnection connection { get; }
 
-        public MessageSender(NetworkConnection connection)
+        protected MessageSender(NetworkConnection connection)
+        {
+            this.connection = connection;
+        }
+    }
+
+    public abstract class MessageSender<T> : MessageSender where T : NetworkConnection
+    {
+        protected new T connection { get; }
+        
+        protected MessageSender(T connection) : base(connection)
         {
             this.connection = connection;
         }
