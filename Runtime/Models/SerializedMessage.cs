@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Essentials;
+using GZipCompress;
 using JetBrains.Annotations;
+using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace MultiplayerProtocol
 {
@@ -184,6 +188,82 @@ namespace MultiplayerProtocol
             var bytes = Encoding.UTF8.GetBytes(value);
             Write(bytes.Length); // Add the length of the string to the packet
             _buffer.AddRange(bytes); // Add the string itself
+        }
+
+        /// <summary>Adds a guid to the packet.</summary>
+        /// <param name="value">The guid to add.</param>
+        public void Write(Guid value)
+        {
+            Write(value.ToString());
+        }
+
+        /// <summary>Adds a namespaced key to the packet.</summary>
+        /// <param name="value">The namespaced key to add.</param>
+        public void Write(NamespacedKey value)
+        {
+            Write(value.ToString());
+        }
+
+        /// <summary>Adds a quaternion key to the packet.</summary>
+        /// <param name="value">The namespaced key to add.</param>
+        public void Write(Quaternion value)
+        {
+            Write(value.x);
+            Write(value.y);
+            Write(value.z);
+            Write(value.w);
+        }
+
+        /// <summary>Adds a vector4 key to the packet.</summary>
+        /// <param name="value">The namespaced key to add.</param>
+        public void Write(Vector4 value)
+        {
+            Write(value.x);
+            Write(value.y);
+            Write(value.z);
+            Write(value.w);
+        }
+
+        /// <summary>Adds a vector3 key to the packet.</summary>
+        /// <param name="value">The namespaced key to add.</param>
+        public void Write(Vector3 value)
+        {
+            Write(value.x);
+            Write(value.y);
+            Write(value.z);
+        }
+
+        /// <summary>Adds a vector2 key to the packet.</summary>
+        /// <param name="value">The namespaced key to add.</param>
+        public void Write(Vector2 value)
+        {
+            Write(value.x);
+            Write(value.y);
+        }
+
+        /// <summary>Adds a vector3int key to the packet.</summary>
+        /// <param name="value">The namespaced key to add.</param>
+        public void Write(Vector3Int value)
+        {
+            Write(value.x);
+            Write(value.y);
+            Write(value.z);
+        }
+
+        /// <summary>Adds a vector2int key to the packet.</summary>
+        /// <param name="value">The namespaced key to add.</param>
+        public void Write(Vector2Int value)
+        {
+            Write(value.x);
+            Write(value.y);
+        }
+
+        /// <summary>Adds a JToken key to the packet.</summary>
+        /// <param name="value">The namespaced key to add.</param>
+        /// <param name="compress">Whether to compress the json before writing it.</param>
+        public void Write(JToken value, bool compress = false)
+        {
+            Write(value != null && compress ? GZipCompressor.CompressString(value.ToString()) : value?.ToString());
         }
 
         #endregion
@@ -422,9 +502,136 @@ namespace MultiplayerProtocol
             }
         }
 
+        /// <summary>Reads a guid from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public Guid ReadGuid(bool moveReadPos = true)
+        {
+            var stringValue = ReadString(moveReadPos);
+            return stringValue != null && Guid.TryParse(stringValue, out var result) ? result : default;
+        }
+
+        /// <summary>Reads a namespaced key from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public NamespacedKey ReadNamespacedKey(bool moveReadPos = true)
+        {
+            var position = _readPos;
+            var nameSpace = ReadString();
+            var key = ReadString();
+            if (!moveReadPos) _readPos = position;
+            return new NamespacedKey(nameSpace, key);
+        }
+
+        /// <summary>Reads a quaternion from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public Quaternion ReadQuaternion(bool moveReadPos = true)
+        {
+            var position = _readPos;
+            var x = ReadFloat();
+            var y = ReadFloat();
+            var z = ReadFloat();
+            var w = ReadFloat();
+            if (!moveReadPos) _readPos = position;
+            return new Quaternion(x, y, z, w);
+        }
+
+        /// <summary>Reads a Vector2Int from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public Vector2Int ReadVector2Int(bool moveReadPos = true)
+        {
+            var position = _readPos;
+            var x = ReadInt();
+            var y = ReadInt();
+            if (!moveReadPos) _readPos = position;
+            return new Vector2Int(x, y);
+        }
+
+        /// <summary>Reads a Vector2 from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public Vector2 ReadVector2(bool moveReadPos = true)
+        {
+            var position = _readPos;
+            var x = ReadFloat();
+            var y = ReadFloat();
+            if (!moveReadPos) _readPos = position;
+            return new Vector2(x, y);
+        }
+
+        /// <summary>Reads a Vector3Int from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public Vector3Int ReadVector3Int(bool moveReadPos = true)
+        {
+            var position = _readPos;
+            var x = ReadInt();
+            var y = ReadInt();
+            var z = ReadInt();
+            if (!moveReadPos) _readPos = position;
+            return new Vector3Int(x, y, z);
+        }
+
+        /// <summary>Reads a Vector3 from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public Vector3 ReadVector3(bool moveReadPos = true)
+        {
+            var position = _readPos;
+            var x = ReadFloat();
+            var y = ReadFloat();
+            var z = ReadFloat();
+            if (!moveReadPos) _readPos = position;
+            return new Vector3(x, y, z);
+        }
+
+        /// <summary>Reads a Vector4 from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public Vector4 ReadVector4(bool moveReadPos = true)
+        {
+            var position = _readPos;
+            var x = ReadFloat();
+            var y = ReadFloat();
+            var z = ReadFloat();
+            var w = ReadFloat();
+            if (!moveReadPos) _readPos = position;
+            return new Vector4(x, y, z, w);
+        }
+
+        /// <summary>Reads a JObject from the packet.</summary>
+        /// <param name="decompress">Whether to decompress the data before parsing it.</param>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public JObject ReadJson(bool decompress = false, bool moveReadPos = true)
+        {
+            var stringValue = ReadString(moveReadPos);
+            if (stringValue == null) return null;
+            if (decompress) stringValue = GZipCompressor.DecompressString(stringValue);
+            try
+            {
+                return JObject.Parse(stringValue);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>Reads a JArray from the packet.</summary>
+        /// <param name="decompress">Whether to decompress the data before parsing it.</param>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public JArray ReadJsonArray(bool decompress = false, bool moveReadPos = true)
+        {
+            var stringValue = ReadString(moveReadPos);
+            if (stringValue == null) return null;
+            if (decompress) stringValue = GZipCompressor.DecompressString(stringValue);
+            try
+            {
+                return JArray.Parse(stringValue);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         #endregion
 
-        private bool _disposed = false;
+        private bool _disposed;
 
         private void Dispose(bool disposing)
         {

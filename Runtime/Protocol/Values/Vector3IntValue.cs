@@ -8,14 +8,12 @@ namespace MultiplayerProtocol
         
         public void SerializeInto(SerializedMessage message)
         {
-            message.Write(value.x);
-            message.Write(value.y);
-            message.Write(value.z);
+            message.Write(value);
         }
 
         public void DeserializeFrom(SerializedMessage message)
         {
-            value = new Vector3Int(message.ReadInt(), message.ReadInt(), message.ReadInt());
+            value = message.ReadVector3Int();
         }
     }
 }

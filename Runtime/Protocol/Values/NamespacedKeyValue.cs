@@ -8,13 +8,12 @@ namespace MultiplayerProtocol
 
         public void SerializeInto(SerializedMessage message)
         {
-            message.Write(value.nameSpace);
-            message.Write(value.key);
+            message.Write(value);
         }
 
         public void DeserializeFrom(SerializedMessage message)
         {
-            value = new NamespacedKey(message.ReadString(), message.ReadString());
+            value = message.ReadNamespacedKey();
         }
     }
 }

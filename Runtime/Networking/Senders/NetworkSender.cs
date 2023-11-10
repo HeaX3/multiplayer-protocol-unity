@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using RSG;
 
-namespace MultiplayerProtocol
+namespace MultiplayerProtocol.Senders
 {
     public sealed class NetworkSender
     {
