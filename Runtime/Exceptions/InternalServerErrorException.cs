@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class InternalServerErrorException : SocketErrorResponse
+    public class InternalServerErrorException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.InternalServerError;
 

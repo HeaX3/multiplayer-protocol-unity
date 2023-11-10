@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using MultiplayerProtocol.Senders;
 using Newtonsoft.Json.Linq;
 using RSG;
+using UnityEngine;
 
 namespace MultiplayerProtocol
 {
@@ -21,6 +23,7 @@ namespace MultiplayerProtocol
             get
             {
                 _protocol ??= new Protocol(handlers
+                    .Prepend(new ErrorHandler(this))
                     .Prepend(new RequestMessageHandler(this))
                     .Prepend(new ResponseMessageHandler(this))
                     .Prepend(new ProtocolMessageHandler(this))
@@ -81,7 +84,21 @@ namespace MultiplayerProtocol
 
         private void OnMessageReceived(SerializedMessage message)
         {
-            protocol.Handle(message);
+            try
+            {
+                protocol.Handle(message);
+            }
+            catch (Exception e)
+            {
+                if (e is RequestErrorResponse requestError)
+                {
+                    Send(new ErrorMessage(requestError));
+                }
+                else
+                {
+                    Debug.LogError(e);
+                }
+            }
         }
     }
 }

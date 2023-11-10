@@ -1,4 +1,5 @@
-﻿using Essentials;
+﻿using System;
+using Essentials;
 using UnityEngine;
 
 namespace MultiplayerProtocol
@@ -27,7 +28,7 @@ namespace MultiplayerProtocol
                     message.requestId.value,
                     RequestResponse.RequestTimeout()
                 ), asyncHandler.maxTimeoutMs);
-                
+
                 asyncHandler.Handle(payload, serializedMessage).Then(response =>
                 {
                     if (timeout.isCancelled) return;
@@ -54,6 +55,19 @@ namespace MultiplayerProtocol
         {
             // Will not run due to the override above
             throw new System.InvalidOperationException();
+        }
+
+        void INetworkMessageListener.Reject(INetworkMessage message, Exception e)
+        {
+            if (message is not RequestMessage request)
+            {
+                throw e;
+            }
+
+            connection.Send(new ResponseMessage(
+                request.requestId.value,
+                e as RequestErrorResponse ?? (IRequestResponse)new RequestResponse(StatusCode.InternalServerError, e)
+            ));
         }
     }
 }

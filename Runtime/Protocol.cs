@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Essentials;
@@ -18,8 +19,8 @@ namespace MultiplayerProtocol
         private readonly HashSet<ushort> threadSafeMessageIds = new();
 
         private readonly Dictionary<string, ushort> partnerProtocol = new();
-
         private readonly Dictionary<Guid, ResponseListener> responseListeners = new();
+        private readonly ConcurrentDictionary<Type, ConcurrentQueue<DateTime>> rateLimitTracker = new();
 
         internal Protocol(IEnumerable<INetworkMessageListener> handlers)
         {
@@ -103,10 +104,10 @@ namespace MultiplayerProtocol
         public void Handle(SerializedMessage serializedMessage)
         {
             INetworkMessage message;
-            INetworkMessageListener handler;
+            INetworkMessageListener listener;
             try
             {
-                message = Deserialize(serializedMessage, out handler);
+                message = Deserialize(serializedMessage, out listener);
             }
             catch (Exception e)
             {
@@ -115,18 +116,32 @@ namespace MultiplayerProtocol
                 return;
             }
 
-            if (handler is INetworkMessageHandler simpleHandler)
+            if (listener is IRateLimited rateLimited)
+            {
+                var tracker = CleanTracker(GetRateLimitTracker(rateLimited));
+                lock (tracker)
+                {
+                    tracker.Enqueue(DateTime.UtcNow);
+                    if (tracker.Count >= rateLimited.maxRequestsPerMinute)
+                    {
+                        listener.Reject(message, new TooManyRequestsException("Too many requests"));
+                        return;
+                    }
+                }
+            }
+
+            if (listener is INetworkMessageHandler simpleHandler)
             {
                 simpleHandler.Handle(message, serializedMessage);
             }
-            else if (handler is INetworkRequestHandler or IAsyncNetworkRequestHandler)
+            else if (listener is INetworkRequestHandler or IAsyncNetworkRequestHandler)
             {
-                Debug.LogError(new InvalidOperationException("Handler " + handler.GetType().Name +
+                Debug.LogError(new InvalidOperationException("Handler " + listener.GetType().Name +
                                                              " expects a request but received a flat message instead!"));
             }
             else
             {
-                Debug.LogWarning("Listener " + handler.GetType().Name +
+                Debug.LogWarning("Listener " + listener.GetType().Name +
                                  " does not implement any message handler interface");
             }
         }
@@ -165,6 +180,31 @@ namespace MultiplayerProtocol
             var result = handler.CreateMessageInstance();
             foreach (var value in result.values) value.DeserializeFrom(message);
             return result;
+        }
+
+        private ConcurrentQueue<DateTime> GetRateLimitTracker(IRateLimited listener)
+        {
+            lock (rateLimitTracker)
+            {
+                if (rateLimitTracker.TryGetValue(listener.messageType, out var existing)) return existing;
+                var result = new ConcurrentQueue<DateTime>();
+                rateLimitTracker[listener.messageType] = result;
+                return result;
+            }
+        }
+
+        private ConcurrentQueue<DateTime> CleanTracker(ConcurrentQueue<DateTime> tracker)
+        {
+            lock (tracker)
+            {
+                var now = DateTime.UtcNow;
+                while (tracker.TryPeek(out var first) && (now - first).TotalSeconds > 60)
+                {
+                    tracker.TryDequeue(out _);
+                }
+
+                return tracker;
+            }
         }
 
         internal class ResponseListener

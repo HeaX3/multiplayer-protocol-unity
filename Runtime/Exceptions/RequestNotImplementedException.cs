@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class RequestNotImplementedException : SocketErrorResponse
+    public class RequestNotImplementedException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.NotImplemented;
 

@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class ForbiddenException : SocketErrorResponse
+    public class ForbiddenException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.Forbidden;
 

@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class ServiceUnavailableException : SocketErrorResponse
+    public class ServiceUnavailableException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.ServiceUnavailable;
 

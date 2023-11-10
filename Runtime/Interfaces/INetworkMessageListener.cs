@@ -7,6 +7,11 @@ namespace MultiplayerProtocol
         string messageId { get; }
         Type messageType { get; }
         INetworkMessage CreateMessageInstance();
+
+        internal void Reject(INetworkMessage message, Exception error)
+        {
+            throw error;
+        }
     }
 
     public interface INetworkMessageListener<in T> : INetworkMessageListener where T : INetworkMessage, new()

@@ -1,7 +1,7 @@
 
 namespace MultiplayerProtocol
 {
-    public class TooManyRequestsException : SocketErrorResponse
+    public class TooManyRequestsException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.TooManyRequests;
 

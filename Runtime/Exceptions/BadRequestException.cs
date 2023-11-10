@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class BadRequestException : SocketErrorResponse
+    public class BadRequestException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.BadRequest;
 

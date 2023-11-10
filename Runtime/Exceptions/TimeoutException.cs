@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class TimeoutException : SocketErrorResponse
+    public class TimeoutException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.RequestTimeout;
 

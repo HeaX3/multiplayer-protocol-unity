@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class GoneException : SocketErrorResponse
+    public class GoneException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.Gone;
 

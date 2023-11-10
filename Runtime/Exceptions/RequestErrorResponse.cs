@@ -2,7 +2,7 @@
 
 namespace MultiplayerProtocol
 {
-    public abstract class SocketErrorResponse : Exception, IRequestResponse
+    public abstract class RequestErrorResponse : Exception, IRequestResponse
     {
         public abstract StatusCode status { get; }
         public bool isError => true;
@@ -18,7 +18,7 @@ namespace MultiplayerProtocol
             return null;
         }
 
-        protected SocketErrorResponse(string message) : base(message)
+        protected RequestErrorResponse(string message) : base(message)
         {
         }
 

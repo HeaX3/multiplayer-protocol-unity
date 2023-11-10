@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class UnauthorizedException : SocketErrorResponse
+    public class UnauthorizedException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.Unauthorized;
 

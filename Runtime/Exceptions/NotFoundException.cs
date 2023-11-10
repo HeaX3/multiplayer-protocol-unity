@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class NotFoundException : SocketErrorResponse
+    public class NotFoundException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.NotFound;
 

@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerProtocol
 {
-    public class UnprocessableEntityException : SocketErrorResponse
+    public class UnprocessableEntityException : RequestErrorResponse
     {
         public override StatusCode status => StatusCode.UnprocessableEntity;
 
