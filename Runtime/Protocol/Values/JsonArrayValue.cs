@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using GZipCompress;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace MultiplayerProtocol
@@ -6,10 +7,22 @@ namespace MultiplayerProtocol
     public class JsonArrayValue : ISerializableValue<JArray>
     {
         public JArray value { get; set; }
+        public bool useCompression { get; }
+
+        public JsonArrayValue(bool useCompression = false)
+        {
+            this.useCompression = useCompression;
+        }
 
         public void SerializeInto(SerializedMessage message)
         {
-            message.Write(value?.ToString());
+            var stringValue = value?.ToString();
+            if (useCompression && stringValue != null)
+            {
+                stringValue = GZipCompressor.CompressString(stringValue);
+            }
+
+            message.Write(stringValue);
         }
 
         public void DeserializeFrom(SerializedMessage message)
@@ -20,6 +33,8 @@ namespace MultiplayerProtocol
                 value = null;
                 return;
             }
+
+            if (useCompression) jsonString = GZipCompressor.DecompressString(jsonString);
 
             try
             {

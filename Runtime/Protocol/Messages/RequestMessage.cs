@@ -6,7 +6,7 @@ namespace MultiplayerProtocol
 {
     public class RequestMessage : INetworkMessage
     {
-        public GuidValue id { get; } = new();
+        public GuidValue requestId { get; } = new();
         public UShortValue messageId { get; } = new();
         private ISerializableValue value { get; }
 
@@ -16,7 +16,7 @@ namespace MultiplayerProtocol
 
         public RequestMessage(ushort messageId, [NotNull] ISerializableValue value)
         {
-            id.value = Guid.NewGuid();
+            requestId.value = Guid.NewGuid();
             this.messageId.value = messageId;
             this.value = value;
         }
@@ -25,7 +25,7 @@ namespace MultiplayerProtocol
         {
             get
             {
-                yield return id;
+                yield return requestId;
                 yield return messageId;
                 if (value != default) yield return value;
             }

@@ -8,6 +8,8 @@ namespace MultiplayerProtocol
             Handle(message);
 
         IPromise<IRequestResponse> Handle(INetworkMessage message);
+        
+        uint maxTimeoutMs => Protocol.DefaultTimeoutMs;
     }
 
     public interface IAsyncNetworkRequestHandler<in TRequestBody> : IAsyncNetworkRequestHandler,

@@ -12,5 +12,6 @@ namespace MultiplayerProtocol
         Exception error();
 
         T value<T>() where T : ISerializableValue, new();
+        byte[] ToBytes();
     }
 }

@@ -3,7 +3,8 @@
     "rootNamespace": "MultiplayerProtocol",
     "references": [
         "Essentials",
-        "RSG.Promise"
+        "RSG.Promise",
+        "GZipCompressor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -2,9 +2,21 @@
 
 namespace MultiplayerProtocol
 {
-    public abstract class SocketErrorResponse : Exception
+    public abstract class SocketErrorResponse : Exception, IRequestResponse
     {
-        public abstract StatusCode statusCode { get; }
+        public abstract StatusCode status { get; }
+        public bool isError => true;
+        public Exception error() => this;
+
+        public T value<T>() where T : ISerializableValue, new()
+        {
+            throw new InvalidOperationException();
+        }
+
+        public byte[] ToBytes()
+        {
+            return null;
+        }
 
         protected SocketErrorResponse(string message) : base(message)
         {

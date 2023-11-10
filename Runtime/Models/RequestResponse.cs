@@ -11,21 +11,24 @@ namespace MultiplayerProtocol
 
         public bool isError { get; }
 
-        public RequestResponse(StatusCode status, SerializedMessage message = null)
+        public RequestResponse(SerializedMessage message) : this(StatusCode.Ok, message)
+        {
+        }
+
+        public RequestResponse(StatusCode status, SerializedMessage message)
         {
             this.status = status;
             this.message = message;
-            if (status == StatusCode.Ok)
-            {
-                _error = null;
-                isError = false;
-            }
-            else
-            {
-                var errorText = status.ToString();
-                _error = new Exception(errorText);
-                isError = true;
-            }
+            _error = null;
+            isError = false;
+        }
+
+        public RequestResponse(ISerializableValue value = null)
+        {
+            status = StatusCode.Ok;
+            message = value?.Serialize();
+            _error = null;
+            isError = false;
         }
 
         public RequestResponse(StatusCode status, Exception error)
@@ -44,11 +47,13 @@ namespace MultiplayerProtocol
         public T value<T>() where T : ISerializableValue, new()
         {
             if (message == null) return new T();
-            
+
             var result = new T();
             result.DeserializeFrom(message);
             return result;
         }
+
+        public byte[] ToBytes() => message?.ToArray();
 
         public override string ToString()
         {
@@ -57,17 +62,17 @@ namespace MultiplayerProtocol
 
         public static RequestResponse Ok(JArray json)
         {
-            return new RequestResponse(StatusCode.Ok);
+            return new RequestResponse();
         }
 
         public static RequestResponse Ok(JObject json)
         {
-            return new RequestResponse(StatusCode.Ok);
+            return new RequestResponse();
         }
 
         public static RequestResponse Ok(string body = null)
         {
-            return new RequestResponse(StatusCode.Ok);
+            return new RequestResponse();
         }
 
         public static RequestResponse BadRequest(string body = null)

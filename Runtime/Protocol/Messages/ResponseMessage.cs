@@ -1,13 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace MultiplayerProtocol
 {
     public class ResponseMessage : INetworkMessage
     {
-        public GuidValue id { get; } = new();
+        public GuidValue requestId { get; } = new();
         public EnumValue<StatusCode> status { get; } = new();
-        
+        public ByteArrayValue body { get; } = new();
+
+        public ResponseMessage()
+        {
+        }
+
+        public ResponseMessage(Guid requestId, [NotNull] IRequestResponse response)
+        {
+            this.requestId.value = requestId;
+            status.value = response.status;
+            body.value = response.ToBytes();
+        }
+
         public T ParseResponse<T>(SerializedMessage message) where T : ISerializableValue, new()
         {
             var result = new T();
@@ -19,8 +32,9 @@ namespace MultiplayerProtocol
         {
             get
             {
-                yield return id;
+                yield return requestId;
                 yield return status;
+                yield return body;
             }
         }
     }

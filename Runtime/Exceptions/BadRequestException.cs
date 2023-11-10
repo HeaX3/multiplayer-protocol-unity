@@ -2,7 +2,7 @@
 {
     public class BadRequestException : SocketErrorResponse
     {
-        public override StatusCode statusCode => StatusCode.BadRequest;
+        public override StatusCode status => StatusCode.BadRequest;
 
         public BadRequestException(string message) : base(message)
         {

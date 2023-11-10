@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "com.heax3.unity-essentials": "",
-    "com.heax3.rsg-promise-unity": ""
+    "com.heax3.rsg-promise-unity": "",
+    "com.heax3.gzip-unity": ""
   }
 }

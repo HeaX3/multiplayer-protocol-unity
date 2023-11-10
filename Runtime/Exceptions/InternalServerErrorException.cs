@@ -2,7 +2,7 @@
 {
     public class InternalServerErrorException : SocketErrorResponse
     {
-        public override StatusCode statusCode => StatusCode.InternalServerError;
+        public override StatusCode status => StatusCode.InternalServerError;
 
         public InternalServerErrorException(string message) : base(message)
         {

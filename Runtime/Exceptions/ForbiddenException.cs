@@ -2,7 +2,7 @@
 {
     public class ForbiddenException : SocketErrorResponse
     {
-        public override StatusCode statusCode => StatusCode.Forbidden;
+        public override StatusCode status => StatusCode.Forbidden;
 
         public ForbiddenException(string message) : base(message)
         {

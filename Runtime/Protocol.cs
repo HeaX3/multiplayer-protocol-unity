@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Essentials;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -9,23 +10,20 @@ namespace MultiplayerProtocol
 {
     public sealed class Protocol
     {
+        public const uint DefaultTimeoutMs = 5000;
+
         private readonly Dictionary<Type, ushort> idMap = new();
         private readonly Dictionary<ushort, INetworkMessageListener> handlers = new();
         private readonly Dictionary<INetworkMessageListener, ushort> handlerIdMap = new();
+        private readonly HashSet<ushort> threadSafeMessageIds = new();
+
+        private readonly Dictionary<string, ushort> partnerProtocol = new();
 
         private readonly Dictionary<Guid, ResponseListener> responseListeners = new();
 
-        public Protocol(params INetworkMessageListener[] handlers) : this(
-            (IEnumerable<INetworkMessageListener>)handlers)
-        {
-        }
-
-        public Protocol(IEnumerable<INetworkMessageListener> handlers)
+        internal Protocol(IEnumerable<INetworkMessageListener> handlers)
         {
             var list = handlers.ToList();
-            list.Insert(0, new RequestMessageHandler(this));
-            list.Insert(0, new ResponseMessageHandler(this));
-            list.Insert(0, new ProtocolMessageHandler(this));
             for (var i = 0; i < list.Count; i++)
             {
                 var handler = list[i];
@@ -33,6 +31,7 @@ namespace MultiplayerProtocol
                 idMap[handler.messageType] = id;
                 this.handlers[id] = handler;
                 handlerIdMap[handler] = id;
+                if (handler is IThreadSafeListener) threadSafeMessageIds.Add(id);
             }
         }
 
@@ -41,7 +40,23 @@ namespace MultiplayerProtocol
             responseListeners.Clear();
         }
 
+        public uint GetDefaultTimeoutMs(ushort messageId)
+        {
+            return handlers.TryGetValue(messageId, out var handler) &&
+                   handler is IAsyncNetworkRequestHandler requestHandler
+                ? requestHandler.maxTimeoutMs
+                : DefaultTimeoutMs;
+        }
+
+        public bool IsThreadSafeMessage(ushort messageId) => threadSafeMessageIds.Contains(messageId);
+
         internal bool TryGetMessageId(Type type, out ushort messageId) => idMap.TryGetValue(type, out messageId);
+
+        internal bool TryGetPartnerMessageId([NotNull] Type type, out ushort messageId)
+        {
+            if (partnerProtocol.TryGetValue(type.FullName ?? "", out messageId)) return true;
+            return TryGetMessageId(type, out messageId);
+        }
 
         public ProtocolMessage CreateProtocolMessage() => new(this);
 
@@ -81,11 +96,7 @@ namespace MultiplayerProtocol
             {
                 var messageId = entry.GetString("m");
                 var id = entry.GetUShort("id");
-                var handler = handlerIdMap.Keys.FirstOrDefault(h => h.messageId == messageId);
-                if (handler == null) continue;
-                idMap[handler.messageType] = id;
-                handlers[id] = handler;
-                handlerIdMap[handler] = id;
+                partnerProtocol[messageId] = id;
             }
         }
 
@@ -108,18 +119,24 @@ namespace MultiplayerProtocol
             {
                 simpleHandler.Handle(message, serializedMessage);
             }
+            else if (handler is INetworkRequestHandler or IAsyncNetworkRequestHandler)
+            {
+                Debug.LogError(new InvalidOperationException("Handler " + handler.GetType().Name +
+                                                             " expects a request but received a flat message instead!"));
+            }
             else
             {
-                throw new InvalidOperationException("Handler " + handler.GetType().Name +
-                                                    " expects a request but received a flat message instead!");
+                Debug.LogWarning("Listener " + handler.GetType().Name +
+                                 " does not implement any message handler interface");
             }
         }
 
         public SerializedMessage Serialize(INetworkMessage message)
         {
-            if (!idMap.TryGetValue(message.GetType(), out var messageId))
+            if (!TryGetPartnerMessageId(message.GetType(), out var messageId))
             {
-                throw new InvalidOperationException("Unknown message type " + message.GetType().Name);
+                throw new InvalidOperationException("Partner does not understand message of type " +
+                                                    message.GetType().FullName);
             }
 
             var result = new SerializedMessage(messageId);
