@@ -197,6 +197,13 @@ namespace MultiplayerProtocol
             Write(value.ToString());
         }
 
+        /// <summary>Adds a date time to the packet.</summary>
+        /// <param name="value">The date time to add.</param>
+        public void Write(DateTime value)
+        {
+            Write((value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime()).ToBinary());
+        }
+
         /// <summary>Adds a namespaced key to the packet.</summary>
         /// <param name="value">The namespaced key to add.</param>
         public void Write(NamespacedKey value)
@@ -508,6 +515,13 @@ namespace MultiplayerProtocol
         {
             var stringValue = ReadString(moveReadPos);
             return stringValue != null && Guid.TryParse(stringValue, out var result) ? result : default;
+        }
+
+        /// <summary>Reads a date time from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public DateTime ReadDateTime(bool moveReadPos = true)
+        {
+            return DateTime.FromBinary(ReadLong(moveReadPos));
         }
 
         /// <summary>Reads a namespaced key from the packet.</summary>
