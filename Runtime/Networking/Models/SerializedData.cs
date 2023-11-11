@@ -9,24 +9,24 @@ using UnityEngine;
 
 namespace MultiplayerProtocol
 {
-    public sealed class SerializedMessage : IDisposable
+    public sealed class SerializedData : IDisposable
     {
         private List<byte> _buffer;
         private byte[] _readableBuffer;
         private int _readPos;
 
         /// <summary>Creates a new empty packet (without an ID).</summary>
-        public SerializedMessage()
+        public SerializedData()
         {
-            _buffer = new List<byte>(); // Intitialize buffer
+            _buffer = new List<byte>(); // Initialize buffer
             _readPos = 0; // Set readPos to 0
         }
 
         /// <summary>Creates a new packet with a given ID. Used for sending.</summary>
         /// <param name="id">The packet ID.</param>
-        public SerializedMessage(ushort id)
+        public SerializedData(ushort id)
         {
-            _buffer = new List<byte>(); // Intitialize buffer
+            _buffer = new List<byte>(); // Initialize buffer
             _readPos = 0; // Set readPos to 0
 
             Write(id); // Write packet id to the buffer
@@ -34,9 +34,9 @@ namespace MultiplayerProtocol
 
         /// <summary>Creates a packet from which data can be read. Used for receiving.</summary>
         /// <param name="data">The bytes to add to the packet.</param>
-        public SerializedMessage(byte[] data)
+        public SerializedData(byte[] data)
         {
-            _buffer = new List<byte>(); // Intitialize buffer
+            _buffer = new List<byte>(); // Initialize buffer
             _readPos = 0; // Set readPos to 0
 
             SetBytes(data);

@@ -101,7 +101,7 @@ namespace MultiplayerProtocol
             }
         }
 
-        public void Handle(SerializedMessage serializedMessage)
+        public void Handle(SerializedData serializedMessage)
         {
             INetworkMessage message;
             INetworkMessageListener listener;
@@ -148,7 +148,7 @@ namespace MultiplayerProtocol
 
         public void Handle(SerializedMessages messages)
         {
-            foreach (var m in messages.value ?? Array.Empty<SerializedMessage>())
+            foreach (var m in messages.value ?? Array.Empty<SerializedData>())
             {
                 try
                 {
@@ -161,7 +161,7 @@ namespace MultiplayerProtocol
             }
         }
 
-        public SerializedMessage Serialize(INetworkMessage message)
+        public SerializedData Serialize(INetworkMessage message)
         {
             if (!TryGetPartnerMessageId(message.GetType(), out var messageId))
             {
@@ -169,7 +169,7 @@ namespace MultiplayerProtocol
                                                     message.GetType().FullName);
             }
 
-            var result = new SerializedMessage(messageId);
+            var result = new SerializedData(messageId);
             foreach (var value in message.values)
             {
                 value.SerializeInto(result);
@@ -186,13 +186,13 @@ namespace MultiplayerProtocol
             return new SerializedMessages(messages.Select(Serialize));
         }
 
-        internal INetworkMessage Deserialize(SerializedMessage message, out INetworkMessageListener handler)
+        internal INetworkMessage Deserialize(SerializedData message, out INetworkMessageListener handler)
         {
             var typeId = message.ReadUShort();
             return Deserialize(message, typeId, out handler);
         }
 
-        internal INetworkMessage Deserialize(SerializedMessage message, ushort typeId,
+        internal INetworkMessage Deserialize(SerializedData message, ushort typeId,
             out INetworkMessageListener handler)
         {
             if (!handlers.TryGetValue(typeId, out handler))

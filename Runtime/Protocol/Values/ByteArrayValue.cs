@@ -13,7 +13,7 @@ namespace MultiplayerProtocol
             this.useCompression = useCompression;
         }
 
-        public void SerializeInto(SerializedMessage message)
+        public void SerializeInto(SerializedData message)
         {
             if (this.value == null)
             {
@@ -26,7 +26,7 @@ namespace MultiplayerProtocol
             message.Write(value);
         }
 
-        public void DeserializeFrom(SerializedMessage message)
+        public void DeserializeFrom(SerializedData message)
         {
             var length = message.ReadInt();
             if (length < 0)

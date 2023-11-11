@@ -16,7 +16,7 @@ namespace MultiplayerProtocol
                 return;
             }
 
-            listener.Receive(new RequestResponse(message.status.value, new SerializedMessage(message.body.value)));
+            listener.Receive(new RequestResponse(message.status.value, new SerializedData(message.body.value)));
         }
     }
 }

@@ -12,12 +12,12 @@ namespace MultiplayerProtocol
             this.useCompression = useCompression;
         }
 
-        public void SerializeInto(SerializedMessage message)
+        public void SerializeInto(SerializedData message)
         {
             message.Write(value, useCompression);
         }
 
-        public void DeserializeFrom(SerializedMessage message)
+        public void DeserializeFrom(SerializedData message)
         {
             value = message.ReadJsonArray(decompress: useCompression);
         }

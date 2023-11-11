@@ -12,14 +12,14 @@ namespace MultiplayerProtocol
             this.useCompression = useCompression;
         }
 
-        public void SerializeInto(SerializedMessage message)
+        public void SerializeInto(SerializedData message)
         {
             var value = this.value;
             if (useCompression && value != null) value = GZipCompressor.CompressString(value);
             message.Write(value);
         }
 
-        public void DeserializeFrom(SerializedMessage message)
+        public void DeserializeFrom(SerializedData message)
         {
             var value = message.ReadString();
             if (useCompression && value != null) value = GZipCompressor.DecompressString(value);

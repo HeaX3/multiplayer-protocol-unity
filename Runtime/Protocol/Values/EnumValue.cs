@@ -14,12 +14,12 @@ namespace MultiplayerProtocol
             }
         }
 
-        public void SerializeInto(SerializedMessage message)
+        public void SerializeInto(SerializedData message)
         {
             message.Write((int)(object)value);
         }
 
-        public void DeserializeFrom(SerializedMessage message)
+        public void DeserializeFrom(SerializedData message)
         {
             value = (T)(object)message.ReadInt();
         }

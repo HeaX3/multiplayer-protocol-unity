@@ -5,28 +5,28 @@ using GZipCompress;
 
 namespace MultiplayerProtocol
 {
-    public class SerializedMessages : ISerializableValue<SerializedMessage[]>
+    public class SerializedMessages : ISerializableValue<SerializedData[]>
     {
-        public SerializedMessage[] value { get; set; }
+        public SerializedData[] value { get; set; }
 
         public SerializedMessages()
         {
         }
 
-        public SerializedMessages(params SerializedMessage[] messages)
+        public SerializedMessages(params SerializedData[] messages)
         {
             value = messages;
         }
 
-        public SerializedMessages(IEnumerable<SerializedMessage> messages)
+        public SerializedMessages(IEnumerable<SerializedData> messages)
         {
             value = messages.ToArray();
         }
 
-        public void SerializeInto(SerializedMessage message)
+        public void SerializeInto(SerializedData message)
         {
-            var raw = new SerializedMessage();
-            var value = this.value ?? Array.Empty<SerializedMessage>();
+            var raw = new SerializedData();
+            var value = this.value ?? Array.Empty<SerializedData>();
             raw.Write(value.Length);
             foreach (var m in value)
             {
@@ -40,17 +40,17 @@ namespace MultiplayerProtocol
             message.Write(compressed);
         }
 
-        public void DeserializeFrom(SerializedMessage message)
+        public void DeserializeFrom(SerializedData message)
         {
             var compressedLength = message.ReadInt();
             var compressed = message.ReadBytes(compressedLength);
-            var raw = new SerializedMessage(GZipCompressor.Decompress(compressed));
+            var raw = new SerializedData(GZipCompressor.Decompress(compressed));
             var count = raw.ReadInt();
-            value = new SerializedMessage[count];
+            value = new SerializedData[count];
             for (var i = 0; i < count; i++)
             {
                 var length = raw.ReadInt();
-                value[i] = new SerializedMessage(raw.ReadBytes(length));
+                value[i] = new SerializedData(raw.ReadBytes(length));
             }
         }
     }

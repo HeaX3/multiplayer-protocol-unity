@@ -10,7 +10,7 @@ namespace MultiplayerProtocol
         {
         }
 
-        public void Handle(RequestMessage message, SerializedMessage serializedMessage)
+        public void Handle(RequestMessage message, SerializedData serializedMessage)
         {
             var payload = protocol.Deserialize(serializedMessage, message.messageId.value, out var handler);
             if (handler is INetworkMessageHandler simpleHandler)

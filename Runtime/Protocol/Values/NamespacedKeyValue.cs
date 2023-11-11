@@ -6,12 +6,12 @@ namespace MultiplayerProtocol
     {
         public NamespacedKey value { get; set; }
 
-        public void SerializeInto(SerializedMessage message)
+        public void SerializeInto(SerializedData message)
         {
             message.Write(value);
         }
 
-        public void DeserializeFrom(SerializedMessage message)
+        public void DeserializeFrom(SerializedData message)
         {
             value = message.ReadNamespacedKey();
         }

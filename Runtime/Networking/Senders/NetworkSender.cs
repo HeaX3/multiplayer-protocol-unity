@@ -28,6 +28,7 @@ namespace MultiplayerProtocol.Senders
                 var requestMessage = new RequestMessage(messageId, message);
                 protocol.AddResponseListener(requestMessage.requestId.value, timeoutMs, response =>
                 {
+                    if (response.extra != null) protocol.Handle(response.extra);
                     if (!response.isError) resolve();
                     else reject(response.error());
                 });
@@ -50,6 +51,7 @@ namespace MultiplayerProtocol.Senders
                 var requestMessage = new RequestMessage(messageId, message);
                 protocol.AddResponseListener(requestMessage.requestId.value, timeoutMs, response =>
                 {
+                    if (response.extra != null) protocol.Handle(response.extra);
                     if (!response.isError) resolve(response.value<TResponse>());
                     else reject(response.error());
                 });

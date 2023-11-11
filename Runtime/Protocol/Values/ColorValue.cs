@@ -6,7 +6,7 @@ namespace MultiplayerProtocol
     {
         public Color value { get; set; }
         
-        public void SerializeInto(SerializedMessage message)
+        public void SerializeInto(SerializedData message)
         {
             message.Write(value.r);
             message.Write(value.g);
@@ -14,7 +14,7 @@ namespace MultiplayerProtocol
             message.Write(value.a);
         }
 
-        public void DeserializeFrom(SerializedMessage message)
+        public void DeserializeFrom(SerializedData message)
         {
             value = new Color(message.ReadFloat(), message.ReadFloat(), message.ReadFloat(), message.ReadFloat());
         }

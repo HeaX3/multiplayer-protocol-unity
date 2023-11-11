@@ -4,7 +4,7 @@ namespace MultiplayerProtocol
 {
     public interface IAsyncNetworkRequestHandler : INetworkMessageListener
     {
-        IPromise<IRequestResponse> Handle(INetworkMessage message, SerializedMessage serializedMessage) =>
+        IPromise<IRequestResponse> Handle(INetworkMessage message, SerializedData serializedMessage) =>
             Handle(message);
 
         IPromise<IRequestResponse> Handle(INetworkMessage message);
@@ -17,7 +17,7 @@ namespace MultiplayerProtocol
         where TRequestBody : INetworkMessage, new()
     {
         IPromise<IRequestResponse> IAsyncNetworkRequestHandler.Handle(INetworkMessage message,
-            SerializedMessage serializedMessage)
+            SerializedData serializedMessage)
         {
             if (message is not TRequestBody t)
             {
@@ -41,7 +41,7 @@ namespace MultiplayerProtocol
             return Handle(t);
         }
 
-        IPromise<IRequestResponse> Handle(TRequestBody message, SerializedMessage serializedMessage) => Handle(message);
+        IPromise<IRequestResponse> Handle(TRequestBody message, SerializedData serializedMessage) => Handle(message);
         IPromise<IRequestResponse> Handle(TRequestBody message);
     }
 }

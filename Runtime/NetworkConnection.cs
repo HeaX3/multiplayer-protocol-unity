@@ -84,7 +84,7 @@ namespace MultiplayerProtocol
         /// <param name="type">Message type</param>
         /// <param name="message">Serialized message</param>
         /// <exception cref="InvalidOperationException">Thrown if the recipient cannot handle the provided message type</exception>
-        public void Send([NotNull] Type type, [NotNull] SerializedMessage message)
+        public void Send([NotNull] Type type, [NotNull] SerializedData message)
         {
             if (!protocol.TryGetPartnerMessageId(type, out var messageId))
             {
@@ -100,7 +100,7 @@ namespace MultiplayerProtocol
         /// message type id that the recipient understands.
         /// </summary>
         /// <param name="message">Serialized message preceded by the message id</param>
-        public void Send([NotNull] SerializedMessage message)
+        public void Send([NotNull] SerializedData message)
         {
             endpoint.Send(message);
         }
@@ -118,7 +118,7 @@ namespace MultiplayerProtocol
             return sender.SendRequest<TMessage, TResponse>(message, timeoutMs);
         }
 
-        private void OnMessageReceived(SerializedMessage message)
+        private void OnMessageReceived(SerializedData message)
         {
             try
             {
