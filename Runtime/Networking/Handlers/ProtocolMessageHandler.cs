@@ -11,9 +11,9 @@ namespace MultiplayerProtocol
         public IRequestResponse Handle(ProtocolMessage message)
         {
             protocol.LoadData(message.value.value ?? new JObject());
-            return new RequestResponse()
+            return new RequestResponse
             {
-                postResponse = new SerializedMessages(protocol.Serialize(protocol.CreateProtocolMessage()))
+                postResponse = new SerializedMessages(protocol.Serialize(protocol.CreateProtocolResponseMessage()))
             };
         }
     }

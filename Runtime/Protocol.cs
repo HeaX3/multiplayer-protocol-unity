@@ -62,8 +62,9 @@ namespace MultiplayerProtocol
         }
 
         public ProtocolMessage CreateProtocolMessage() => new(this);
+        public ProtocolResponseMessage CreateProtocolResponseMessage() => new(this);
 
-        internal void AddResponseListener(Guid requestId, uint timeoutMs, Action<IRequestResponse> callback)
+        internal void AddResponseListener(Guid requestId, uint timeoutMs, Action<ResponseMessage> callback)
         {
             responseListeners[requestId] = new ResponseListener(callback, DateTime.UtcNow.AddMilliseconds(timeoutMs));
         }
@@ -234,25 +235,25 @@ namespace MultiplayerProtocol
 
         internal class ResponseListener
         {
-            private Action<IRequestResponse> callback { get; }
+            private Action<ResponseMessage> callback { get; }
             public DateTime timeout { get; }
 
             private bool received;
 
-            public ResponseListener(Action<IRequestResponse> callback, DateTime timeout)
+            public ResponseListener(Action<ResponseMessage> callback, DateTime timeout)
             {
                 this.callback = callback;
                 this.timeout = timeout;
             }
 
-            public void Receive(IRequestResponse response)
+            public void Receive(ResponseMessage response)
             {
                 if (received) throw new InvalidOperationException("Response already received");
                 received = true;
 
                 if (DateTime.UtcNow > timeout)
                 {
-                    callback(RequestResponse.RequestTimeout());
+                    callback(new ResponseMessage(response.requestId.value, RequestResponse.RequestTimeout()));
                     return;
                 }
 

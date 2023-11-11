@@ -29,6 +29,7 @@ namespace MultiplayerProtocol
                     .Prepend(new ErrorHandler(this))
                     .Prepend(new RequestMessageHandler(this))
                     .Prepend(new ResponseMessageHandler(this))
+                    .Prepend(new ProtocolResponseMessageHandler(this))
                     .Prepend(new ProtocolMessageHandler(this))
                 );
                 return _protocol;

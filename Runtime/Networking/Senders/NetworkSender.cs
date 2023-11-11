@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using RSG;
+using UnityEngine;
 
 namespace MultiplayerProtocol.Senders
 {
@@ -52,6 +53,8 @@ namespace MultiplayerProtocol.Senders
                 var requestMessage = new RequestMessage(messageId, message);
                 protocol.AddResponseListener(requestMessage.requestId.value, timeoutMs, response =>
                 {
+                    Debug.Log("Response has pre response messages: " + (response.preResponse.value?.Length > 0 ? "yes" : "no"));
+                    Debug.Log("Response has post response messages: " + (response.postResponse.value?.Length > 0 ? "yes" : "no"));
                     if (response.preResponse?.value != null) protocol.Handle(response.preResponse);
                     if (!response.isError && responseHandler != null) responseHandler();
                     else if (response.isError && errorHandler != null) errorHandler(response.error());

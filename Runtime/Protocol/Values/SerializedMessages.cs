@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GZipCompress;
 using JetBrains.Annotations;
@@ -26,14 +25,14 @@ namespace MultiplayerProtocol
 
         public void SerializeInto(SerializedData message)
         {
-            if (this.value?.Length < 1)
+            if (this.value == null || this.value.Length < 1)
             {
                 message.Write(0);
                 return;
             }
 
             var raw = new SerializedData();
-            var value = this.value ?? Array.Empty<SerializedData>();
+            var value = this.value;
             raw.Write(value.Length);
             foreach (var m in value)
             {
@@ -52,19 +51,21 @@ namespace MultiplayerProtocol
             var compressedLength = message.ReadInt();
             if (compressedLength == 0)
             {
-                value = null;
+                this.value = null;
                 return;
             }
 
             var compressed = message.ReadBytes(compressedLength);
             var raw = new SerializedData(GZipCompressor.Decompress(compressed));
             var count = raw.ReadInt();
-            value = new SerializedData[count];
+            var value = new SerializedData[count];
             for (var i = 0; i < count; i++)
             {
                 var length = raw.ReadInt();
                 value[i] = new SerializedData(raw.ReadBytes(length));
             }
+
+            this.value = value;
         }
     }
 }

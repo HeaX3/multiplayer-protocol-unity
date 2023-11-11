@@ -8,8 +8,8 @@ namespace MultiplayerProtocol
         StatusCode status { get; }
         bool isError { get; }
 
-        SerializedMessages preResponse => null;
-        SerializedMessages postResponse => null;
+        [CanBeNull] SerializedMessages preResponse => null;
+        [CanBeNull] SerializedMessages postResponse => null;
         
         [CanBeNull]
         Exception error();

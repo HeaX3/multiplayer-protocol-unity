@@ -6,13 +6,15 @@ namespace MultiplayerProtocol
     public class RequestResponse : IRequestResponse
     {
         public StatusCode status { get; }
+
         /// <summary>
         /// Bundle of additional messages which should be received before the response is handled
         /// </summary>
         public SerializedMessages preResponse { get; set; }
+
         /// Bundle of additional messages which should be received after the response is handled, but before the requesting application logic continues
         public SerializedMessages postResponse { get; set; }
-        
+
         private readonly SerializedData message;
         private readonly Exception _error;
 
@@ -22,7 +24,7 @@ namespace MultiplayerProtocol
         /// Create a new request response and set the response status code to <see cref="StatusCode"/>.OK
         /// </summary>
         /// <param name="message">Serialized response value</param>
-        public RequestResponse(SerializedData message)
+        public RequestResponse([CanBeNull] SerializedData message)
             : this(StatusCode.Ok, message)
         {
         }
@@ -32,7 +34,7 @@ namespace MultiplayerProtocol
         /// </summary>
         /// <param name="status">Response status</param>
         /// <param name="message">Serialized response value</param>
-        public RequestResponse(StatusCode status, SerializedData message)
+        public RequestResponse(StatusCode status, [CanBeNull] SerializedData message)
         {
             this.status = status;
             this.message = message;
@@ -44,7 +46,7 @@ namespace MultiplayerProtocol
         /// Create a new request response and set the response status code to <see cref="StatusCode"/>.OK
         /// </summary>
         /// <param name="value">Serializable response value</param>
-        public RequestResponse(ISerializableValue value = null)
+        public RequestResponse([CanBeNull] ISerializableValue value = null)
         {
             status = StatusCode.Ok;
             message = value?.Serialize();
@@ -57,7 +59,7 @@ namespace MultiplayerProtocol
         /// </summary>
         /// <param name="status">Response status code</param>
         /// <param name="error">The exception</param>
-        public RequestResponse(StatusCode status, Exception error)
+        public RequestResponse(StatusCode status, [NotNull] Exception error)
         {
             this.status = status;
             message = null;

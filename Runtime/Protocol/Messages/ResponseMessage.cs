@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using JetBrains.Annotations;
 
 namespace MultiplayerProtocol
@@ -8,24 +9,36 @@ namespace MultiplayerProtocol
     {
         public GuidValue requestId { get; } = new();
         public EnumValue<StatusCode> status { get; } = new();
-        public SerializedMessages preResponse { get; }
+        [NotNull] public SerializedMessages preResponse { get; }
         public ByteArrayValue body { get; } = new();
-        public SerializedMessages postResponse { get; }
+        [NotNull] public SerializedMessages postResponse { get; }
+
+        public bool isError => status.value != StatusCode.Ok;
+
+        public Exception error() => RequestErrorResponse.Of(status.value,
+            body.value != null ? Encoding.UTF8.GetString(body.value) : status.value.ToString());
+
+        public T value<T>() where T : ISerializableValue, new()
+        {
+            return ParseResponse<T>(new SerializedData(body.value ?? Array.Empty<byte>()));
+        }
 
         public ResponseMessage()
         {
+            preResponse = new SerializedMessages();
+            postResponse = new SerializedMessages();
         }
 
         public ResponseMessage(Guid requestId, [NotNull] IRequestResponse response)
         {
             this.requestId.value = requestId;
             status.value = response.status;
-            preResponse = response.preResponse;
-            postResponse = response.postResponse;
+            preResponse = response.preResponse ?? new SerializedMessages();
+            postResponse = response.postResponse ?? new SerializedMessages();
             body.value = response.ToBytes();
         }
 
-        public T ParseResponse<T>(SerializedData message) where T : ISerializableValue, new()
+        private T ParseResponse<T>(SerializedData message) where T : ISerializableValue, new()
         {
             var result = new T();
             result.DeserializeFrom(message);
@@ -38,9 +51,9 @@ namespace MultiplayerProtocol
             {
                 yield return requestId;
                 yield return status;
-                yield return preResponse ?? new SerializedMessages();
+                yield return preResponse;
                 yield return body;
-                yield return postResponse ?? new SerializedMessages();
+                yield return postResponse;
             }
         }
     }
