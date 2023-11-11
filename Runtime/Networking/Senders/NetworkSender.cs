@@ -14,7 +14,31 @@ namespace MultiplayerProtocol.Senders
             this.connection = connection;
         }
 
-        public IPromise SendRequest<T>([NotNull] T message, uint timeoutMs = 5000)
+        public IPromise SendRequest<T>(
+            [NotNull] T message,
+            uint timeoutMs = 5000
+        )
+            where T : INetworkMessage
+        {
+            return SendRequest(message, null, null, timeoutMs);
+        }
+
+        public IPromise SendRequest<T>(
+            [NotNull] T message,
+            Action responseHandler,
+            uint timeoutMs = 5000
+        )
+            where T : INetworkMessage
+        {
+            return SendRequest(message, responseHandler, null, timeoutMs);
+        }
+
+        public IPromise SendRequest<T>(
+            [NotNull] T message,
+            Action responseHandler,
+            Action<Exception> errorHandler,
+            uint timeoutMs = 5000
+        )
             where T : INetworkMessage
         {
             return new Promise((resolve, reject) =>
@@ -28,7 +52,10 @@ namespace MultiplayerProtocol.Senders
                 var requestMessage = new RequestMessage(messageId, message);
                 protocol.AddResponseListener(requestMessage.requestId.value, timeoutMs, response =>
                 {
-                    if (response.extra != null) protocol.Handle(response.extra);
+                    if (response.preResponse?.value != null) protocol.Handle(response.preResponse);
+                    if (!response.isError && responseHandler != null) responseHandler();
+                    else if (response.isError && errorHandler != null) errorHandler(response.error());
+                    if (response.postResponse?.value != null) protocol.Handle(response.postResponse);
                     if (!response.isError) resolve();
                     else reject(response.error());
                 });
@@ -36,11 +63,27 @@ namespace MultiplayerProtocol.Senders
             });
         }
 
-        public IPromise<TResponse> SendRequest<TMessage, TResponse>([NotNull] TMessage message, uint timeoutMs = 5000)
+        public IPromise SendRequest<TMessage, TResponse>(
+            [NotNull] TMessage message,
+            Action<TResponse> responseHandler,
+            uint timeoutMs = 5000
+        )
             where TMessage : INetworkMessage
             where TResponse : ISerializableValue, new()
         {
-            return new Promise<TResponse>((resolve, reject) =>
+            return SendRequest(message, responseHandler, null, timeoutMs);
+        }
+
+        public IPromise SendRequest<TMessage, TResponse>(
+            [NotNull] TMessage message,
+            Action<TResponse> responseHandler,
+            Action<Exception> errorHandler,
+            uint timeoutMs = 5000
+        )
+            where TMessage : INetworkMessage
+            where TResponse : ISerializableValue, new()
+        {
+            return new Promise((resolve, reject) =>
             {
                 if (!protocol.TryGetPartnerMessageId(message.GetType(), out var messageId))
                 {
@@ -51,8 +94,11 @@ namespace MultiplayerProtocol.Senders
                 var requestMessage = new RequestMessage(messageId, message);
                 protocol.AddResponseListener(requestMessage.requestId.value, timeoutMs, response =>
                 {
-                    if (response.extra != null) protocol.Handle(response.extra);
-                    if (!response.isError) resolve(response.value<TResponse>());
+                    if (response.preResponse?.value != null) protocol.Handle(response.preResponse);
+                    if (!response.isError) responseHandler(response.value<TResponse>());
+                    else if (errorHandler != null) errorHandler(response.error());
+                    if (response.postResponse?.value != null) protocol.Handle(response.postResponse);
+                    if (!response.isError) resolve();
                     else reject(response.error());
                 });
                 connection.Send(requestMessage);

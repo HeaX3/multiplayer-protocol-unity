@@ -8,11 +8,9 @@ namespace MultiplayerProtocol.Senders
         {
         }
 
-        public IPromise<ProtocolMessage> SendProtocol()
+        public IPromise SendProtocol()
         {
-            return connection.SendRequest<ProtocolMessage, ProtocolMessage>(
-                connection.protocol.CreateProtocolMessage()
-            );
+            return connection.SendRequest(connection.protocol.CreateProtocolMessage());
         }
     }
 }

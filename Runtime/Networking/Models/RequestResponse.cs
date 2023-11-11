@@ -6,7 +6,13 @@ namespace MultiplayerProtocol
     public class RequestResponse : IRequestResponse
     {
         public StatusCode status { get; }
-        public SerializedMessages extra { get; }
+        /// <summary>
+        /// Bundle of additional messages which should be received before the response is handled
+        /// </summary>
+        public SerializedMessages preResponse { get; set; }
+        /// Bundle of additional messages which should be received after the response is handled, but before the requesting application logic continues
+        public SerializedMessages postResponse { get; set; }
+        
         private readonly SerializedData message;
         private readonly Exception _error;
 
@@ -16,9 +22,8 @@ namespace MultiplayerProtocol
         /// Create a new request response and set the response status code to <see cref="StatusCode"/>.OK
         /// </summary>
         /// <param name="message">Serialized response value</param>
-        /// <param name="extra">Bundle of additional messages which should be received before the response is handled</param>
-        public RequestResponse(SerializedData message, SerializedMessages extra = null)
-            : this(StatusCode.Ok, message, extra)
+        public RequestResponse(SerializedData message)
+            : this(StatusCode.Ok, message)
         {
         }
 
@@ -27,11 +32,9 @@ namespace MultiplayerProtocol
         /// </summary>
         /// <param name="status">Response status</param>
         /// <param name="message">Serialized response value</param>
-        /// <param name="extra">Bundle of additional messages which should be received before the response is handled</param>
-        public RequestResponse(StatusCode status, SerializedData message, SerializedMessages extra = null)
+        public RequestResponse(StatusCode status, SerializedData message)
         {
             this.status = status;
-            this.extra = extra;
             this.message = message;
             _error = null;
             isError = false;
@@ -44,29 +47,6 @@ namespace MultiplayerProtocol
         public RequestResponse(ISerializableValue value = null)
         {
             status = StatusCode.Ok;
-            message = value?.Serialize();
-            _error = null;
-            isError = false;
-        }
-
-        /// <summary>
-        /// Create a new request response and set the response status code to <see cref="StatusCode"/>.OK
-        /// </summary>
-        /// <param name="extra">Bundle of additional messages which should be received before the response is handled</param>
-        public RequestResponse(SerializedMessages extra)
-            : this((ISerializableValue)null, extra)
-        {
-        }
-
-        /// <summary>
-        /// Create a new request response and set the response status code to <see cref="StatusCode"/>.OK
-        /// </summary>
-        /// <param name="value">Serializable value</param>
-        /// <param name="extra">Bundle of additional messages which should be received before the response is handled</param>
-        public RequestResponse(ISerializableValue value, SerializedMessages extra)
-        {
-            status = StatusCode.Ok;
-            this.extra = extra;
             message = value?.Serialize();
             _error = null;
             isError = false;

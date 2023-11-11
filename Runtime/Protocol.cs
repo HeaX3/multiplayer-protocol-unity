@@ -22,6 +22,8 @@ namespace MultiplayerProtocol
         private readonly Dictionary<Guid, ResponseListener> responseListeners = new();
         private readonly ConcurrentDictionary<Type, ConcurrentQueue<DateTime>> rateLimitTracker = new();
 
+        public bool partnerProtocolReceived => partnerProtocol.Count > 0;
+
         internal Protocol(IEnumerable<INetworkMessageListener> handlers)
         {
             var list = handlers.ToList();

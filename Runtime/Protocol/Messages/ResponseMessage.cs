@@ -8,8 +8,9 @@ namespace MultiplayerProtocol
     {
         public GuidValue requestId { get; } = new();
         public EnumValue<StatusCode> status { get; } = new();
-        public SerializedMessages extra { get; }
+        public SerializedMessages preResponse { get; }
         public ByteArrayValue body { get; } = new();
+        public SerializedMessages postResponse { get; }
 
         public ResponseMessage()
         {
@@ -19,7 +20,8 @@ namespace MultiplayerProtocol
         {
             this.requestId.value = requestId;
             status.value = response.status;
-            extra = response.extra;
+            preResponse = response.preResponse;
+            postResponse = response.postResponse;
             body.value = response.ToBytes();
         }
 
@@ -36,8 +38,9 @@ namespace MultiplayerProtocol
             {
                 yield return requestId;
                 yield return status;
-                yield return extra ?? new SerializedMessages();
+                yield return preResponse ?? new SerializedMessages();
                 yield return body;
+                yield return postResponse ?? new SerializedMessages();
             }
         }
     }

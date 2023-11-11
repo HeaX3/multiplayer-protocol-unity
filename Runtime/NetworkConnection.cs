@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using MultiplayerProtocol.Senders;
-using Newtonsoft.Json.Linq;
 using RSG;
 using UnityEngine;
 
@@ -54,14 +53,7 @@ namespace MultiplayerProtocol
         /// </summary>
         public IPromise PerformProtocolHandshake()
         {
-            return new Promise((resolve, reject) =>
-            {
-                protocolSender.SendProtocol().Then(protocol =>
-                {
-                    this.protocol.LoadData(protocol.value.value ?? new JObject());
-                    resolve();
-                }).Catch(reject);
-            });
+            return protocolSender.SendProtocol();
         }
 
         /// <summary>
@@ -105,17 +97,46 @@ namespace MultiplayerProtocol
             endpoint.Send(message);
         }
 
-        public IPromise SendRequest<T>([NotNull] T message, uint timeoutMs = 5000)
-            where T : INetworkMessage, new()
-        {
-            return sender.SendRequest(message, timeoutMs);
-        }
+        public IPromise SendRequest<T>(
+            [NotNull] T message,
+            uint timeoutMs = 5000
+        ) where T : INetworkMessage => sender.SendRequest(message, timeoutMs);
 
-        public IPromise<TResponse> SendRequest<TMessage, TResponse>([NotNull] TMessage message, uint timeoutMs = 5000)
+
+        public IPromise SendRequest<T>(
+            [NotNull] T message,
+            Action responseHandler,
+            uint timeoutMs = 5000
+        ) where T : INetworkMessage => sender.SendRequest(message, responseHandler, timeoutMs);
+
+        public IPromise SendRequest<T>(
+            [NotNull] T message,
+            Action responseHandler,
+            Action<Exception> errorHandler,
+            uint timeoutMs = 5000
+        ) where T : INetworkMessage, new() => sender.SendRequest(message, timeoutMs);
+
+        public IPromise SendRequest<TMessage, TResponse>(
+            [NotNull] TMessage message,
+            Action<TResponse> responseHandler,
+            uint timeoutMs = 5000
+        )
             where TMessage : INetworkMessage
             where TResponse : ISerializableValue, new()
         {
-            return sender.SendRequest<TMessage, TResponse>(message, timeoutMs);
+            return sender.SendRequest(message, responseHandler, timeoutMs);
+        }
+
+        public IPromise SendRequest<TMessage, TResponse>(
+            [NotNull] TMessage message,
+            Action<TResponse> responseHandler,
+            Action<Exception> errorHandler,
+            uint timeoutMs = 5000
+        )
+            where TMessage : INetworkMessage
+            where TResponse : ISerializableValue, new()
+        {
+            return sender.SendRequest(message, responseHandler, errorHandler, timeoutMs);
         }
 
         private void OnMessageReceived(SerializedData message)

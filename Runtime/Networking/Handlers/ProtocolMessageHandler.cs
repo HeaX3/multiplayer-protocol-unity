@@ -7,12 +7,14 @@ namespace MultiplayerProtocol
         public ProtocolMessageHandler(NetworkConnection connection) : base(connection)
         {
         }
-        
+
         public IRequestResponse Handle(ProtocolMessage message)
         {
             protocol.LoadData(message.value.value ?? new JObject());
-            return protocol.CreateProtocolMessage();
+            return new RequestResponse()
+            {
+                postResponse = new SerializedMessages(protocol.Serialize(protocol.CreateProtocolMessage()))
+            };
         }
-
     }
 }

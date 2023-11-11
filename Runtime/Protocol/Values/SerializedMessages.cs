@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using GZipCompress;
+using JetBrains.Annotations;
 
 namespace MultiplayerProtocol
 {
     public class SerializedMessages : ISerializableValue<SerializedData[]>
     {
-        public SerializedData[] value { get; set; }
+        [CanBeNull] public SerializedData[] value { get; set; }
 
         public SerializedMessages()
         {
@@ -25,6 +26,12 @@ namespace MultiplayerProtocol
 
         public void SerializeInto(SerializedData message)
         {
+            if (this.value?.Length < 1)
+            {
+                message.Write(0);
+                return;
+            }
+
             var raw = new SerializedData();
             var value = this.value ?? Array.Empty<SerializedData>();
             raw.Write(value.Length);
@@ -43,6 +50,12 @@ namespace MultiplayerProtocol
         public void DeserializeFrom(SerializedData message)
         {
             var compressedLength = message.ReadInt();
+            if (compressedLength == 0)
+            {
+                value = null;
+                return;
+            }
+
             var compressed = message.ReadBytes(compressedLength);
             var raw = new SerializedData(GZipCompressor.Decompress(compressed));
             var count = raw.ReadInt();
