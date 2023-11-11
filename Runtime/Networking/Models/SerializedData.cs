@@ -204,15 +204,15 @@ namespace MultiplayerProtocol
             Write((value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime()).ToBinary());
         }
 
-        /// <summary>Adds a namespaced key to the packet.</summary>
-        /// <param name="value">The namespaced key to add.</param>
+        /// <summary>Adds a NamespacedKey to the packet.</summary>
+        /// <param name="value">The NamespacedKey to add.</param>
         public void Write(NamespacedKey value)
         {
             Write(value.ToString());
         }
 
-        /// <summary>Adds a quaternion key to the packet.</summary>
-        /// <param name="value">The namespaced key to add.</param>
+        /// <summary>Adds a Quaternion to the packet.</summary>
+        /// <param name="value">The Quaternion to add.</param>
         public void Write(Quaternion value)
         {
             Write(value.x);
@@ -221,8 +221,8 @@ namespace MultiplayerProtocol
             Write(value.w);
         }
 
-        /// <summary>Adds a vector4 key to the packet.</summary>
-        /// <param name="value">The namespaced key to add.</param>
+        /// <summary>Adds a Vector4 to the packet.</summary>
+        /// <param name="value">The Vector4 to add.</param>
         public void Write(Vector4 value)
         {
             Write(value.x);
@@ -231,8 +231,8 @@ namespace MultiplayerProtocol
             Write(value.w);
         }
 
-        /// <summary>Adds a vector3 key to the packet.</summary>
-        /// <param name="value">The namespaced key to add.</param>
+        /// <summary>Adds a Vector3 to the packet.</summary>
+        /// <param name="value">The Vector3 to add.</param>
         public void Write(Vector3 value)
         {
             Write(value.x);
@@ -240,16 +240,16 @@ namespace MultiplayerProtocol
             Write(value.z);
         }
 
-        /// <summary>Adds a vector2 key to the packet.</summary>
-        /// <param name="value">The namespaced key to add.</param>
+        /// <summary>Adds a Vector2 to the packet.</summary>
+        /// <param name="value">The Vector2 to add.</param>
         public void Write(Vector2 value)
         {
             Write(value.x);
             Write(value.y);
         }
 
-        /// <summary>Adds a vector3int key to the packet.</summary>
-        /// <param name="value">The namespaced key to add.</param>
+        /// <summary>Adds a Vector3Int to the packet.</summary>
+        /// <param name="value">The Vector3Int to add.</param>
         public void Write(Vector3Int value)
         {
             Write(value.x);
@@ -257,20 +257,27 @@ namespace MultiplayerProtocol
             Write(value.z);
         }
 
-        /// <summary>Adds a vector2int key to the packet.</summary>
-        /// <param name="value">The namespaced key to add.</param>
+        /// <summary>Adds a Vector2Int to the packet.</summary>
+        /// <param name="value">The Vector2Int to add.</param>
         public void Write(Vector2Int value)
         {
             Write(value.x);
             Write(value.y);
         }
 
-        /// <summary>Adds a JToken key to the packet.</summary>
-        /// <param name="value">The namespaced key to add.</param>
+        /// <summary>Adds a JToken to the packet.</summary>
+        /// <param name="value">The JToken key to add.</param>
         /// <param name="compress">Whether to compress the json before writing it.</param>
         public void Write(JToken value, bool compress = false)
         {
             Write(value != null && compress ? GZipCompressor.CompressString(value.ToString()) : value?.ToString());
+        }
+
+        /// <summary>Adds a serializable value to the packet.</summary>
+        /// <param name="value">The serializable value to add.</param>
+        public void Write(ISerializableValue value)
+        {
+            value.SerializeInto(this);
         }
 
         #endregion
@@ -641,6 +648,14 @@ namespace MultiplayerProtocol
             {
                 return null;
             }
+        }
+
+        /// <summary>Reads a serialized value from the packet.</summary>
+        public T Read<T>() where T : ISerializableValue, new()
+        {
+            var result = new T();
+            result.DeserializeFrom(this);
+            return result;
         }
 
         #endregion
