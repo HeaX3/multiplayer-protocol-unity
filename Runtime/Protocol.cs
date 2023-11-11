@@ -146,6 +146,21 @@ namespace MultiplayerProtocol
             }
         }
 
+        public void Handle(SerializedMessages messages)
+        {
+            foreach (var m in messages.value ?? Array.Empty<SerializedMessage>())
+            {
+                try
+                {
+                    Handle(m);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                }
+            }
+        }
+
         public SerializedMessage Serialize(INetworkMessage message)
         {
             if (!TryGetPartnerMessageId(message.GetType(), out var messageId))
@@ -161,6 +176,14 @@ namespace MultiplayerProtocol
             }
 
             return result;
+        }
+
+        public SerializedMessages Serialize(params INetworkMessage[] messages) =>
+            Serialize((IEnumerable<INetworkMessage>)messages);
+
+        public SerializedMessages Serialize(IEnumerable<INetworkMessage> messages)
+        {
+            return new SerializedMessages(messages.Select(Serialize));
         }
 
         internal INetworkMessage Deserialize(SerializedMessage message, out INetworkMessageListener handler)

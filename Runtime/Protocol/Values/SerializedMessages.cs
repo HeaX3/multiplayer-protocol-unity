@@ -5,20 +5,20 @@ using GZipCompress;
 
 namespace MultiplayerProtocol
 {
-    public class MessageArrayValue : ISerializableValue<SerializedMessage[]>
+    public class SerializedMessages : ISerializableValue<SerializedMessage[]>
     {
         public SerializedMessage[] value { get; set; }
 
-        public MessageArrayValue()
+        public SerializedMessages()
         {
         }
 
-        public MessageArrayValue(params SerializedMessage[] messages)
+        public SerializedMessages(params SerializedMessage[] messages)
         {
             value = messages;
         }
 
-        public MessageArrayValue(IEnumerable<SerializedMessage> messages)
+        public SerializedMessages(IEnumerable<SerializedMessage> messages)
         {
             value = messages.ToArray();
         }
@@ -52,14 +52,6 @@ namespace MultiplayerProtocol
                 var length = raw.ReadInt();
                 value[i] = new SerializedMessage(raw.ReadBytes(length));
             }
-        }
-
-        public static MessageArrayValue Create(Protocol protocol, params INetworkMessage[] messages) =>
-            Create(protocol, (IEnumerable<INetworkMessage>)messages);
-
-        public static MessageArrayValue Create(Protocol protocol, IEnumerable<INetworkMessage> messages)
-        {
-            return new MessageArrayValue(messages.Select(protocol.Serialize));
         }
     }
 }
