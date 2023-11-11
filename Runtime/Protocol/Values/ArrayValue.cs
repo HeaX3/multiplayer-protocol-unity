@@ -7,6 +7,15 @@ namespace MultiplayerProtocol
     {
         public T[] value { get; set; }
 
+        public ArrayValue()
+        {
+        }
+
+        public ArrayValue(T[] value)
+        {
+            this.value = value;
+        }
+
         public void SerializeInto(SerializedData message)
         {
             var length = this.value?.Length ?? 0;
