@@ -6,6 +6,6 @@ namespace MultiplayerProtocol.Senders
     {
         public abstract IEnumerable<NetworkConnection> GetConnections();
 
-        public void Send(INetworkMessage message) => ((IScopedMessageSender)this).Send(message);
+        public void SendToAll(INetworkMessage message) => ((IScopedMessageSender)this).Send(message);
     }
 }
