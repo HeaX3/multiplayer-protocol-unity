@@ -11,6 +11,10 @@ namespace MultiplayerProtocol
 {
     public abstract class NetworkConnection
     {
+        public delegate void CloseEvent();
+
+        public event CloseEvent closed = delegate { };
+
         private NetworkSender sender { get; }
         private ProtocolSender protocolSender { get; }
         internal ResponseSender responseSender { get; }
@@ -40,6 +44,7 @@ namespace MultiplayerProtocol
             sender = new NetworkSender(this);
             protocolSender = new ProtocolSender(this);
             responseSender = new ResponseSender(this);
+            endpoint.closed += () => closed();
             endpoint.received += OnMessageReceived;
         }
 
