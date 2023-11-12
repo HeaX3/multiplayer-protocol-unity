@@ -64,6 +64,11 @@ namespace MultiplayerProtocol
                 throw e;
             }
 
+            if (e is not RequestErrorResponse || e is InternalServerErrorException)
+            {
+                Debug.LogError(e);
+            }
+
             connection.Send(new ResponseMessage(
                 request.requestId.value,
                 e as RequestErrorResponse ?? (IRequestResponse)new RequestResponse(StatusCode.InternalServerError, e)
