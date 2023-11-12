@@ -127,11 +127,37 @@ namespace MultiplayerProtocol
             _buffer.AddRange(BitConverter.GetBytes(value));
         }
 
+        public void Write(IEnumerable<short> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<short> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds a ushort to the packet.</summary>
         /// <param name="value">The ushort to add.</param>
         public void Write(ushort value)
         {
             _buffer.AddRange(BitConverter.GetBytes(value));
+        }
+
+        public void Write(IEnumerable<ushort> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<ushort> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
         }
 
         /// <summary>Adds an ushort to the packet.</summary>
@@ -141,11 +167,37 @@ namespace MultiplayerProtocol
             _buffer.AddRange(BitConverter.GetBytes(value));
         }
 
+        public void Write(IEnumerable<uint> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<uint> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds an int to the packet.</summary>
         /// <param name="value">The int to add.</param>
         public void Write(int value)
         {
             _buffer.AddRange(BitConverter.GetBytes(value));
+        }
+
+        public void Write(IEnumerable<int> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<int> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
         }
 
         /// <summary>Adds a long to the packet.</summary>
@@ -155,11 +207,37 @@ namespace MultiplayerProtocol
             _buffer.AddRange(BitConverter.GetBytes(value));
         }
 
+        public void Write(IEnumerable<long> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<long> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds a ulong to the packet.</summary>
         /// <param name="value">The ulong to add.</param>
         public void Write(ulong value)
         {
             _buffer.AddRange(BitConverter.GetBytes(value));
+        }
+
+        public void Write(IEnumerable<ulong> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<ulong> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
         }
 
         /// <summary>Adds a float to the packet.</summary>
@@ -169,11 +247,37 @@ namespace MultiplayerProtocol
             _buffer.AddRange(BitConverter.GetBytes(value));
         }
 
+        public void Write(IEnumerable<float> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<float> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds a bool to the packet.</summary>
         /// <param name="value">The bool to add.</param>
         public void Write(bool value)
         {
             _buffer.AddRange(BitConverter.GetBytes(value));
+        }
+
+        public void Write(IEnumerable<bool> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<bool> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
         }
 
         /// <summary>Adds a string to the packet.</summary>
@@ -191,11 +295,37 @@ namespace MultiplayerProtocol
             _buffer.AddRange(bytes); // Add the string itself
         }
 
+        public void Write(IEnumerable<string> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<string> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds a guid to the packet.</summary>
         /// <param name="value">The guid to add.</param>
         public void Write(Guid value)
         {
             Write(value.ToString());
+        }
+
+        public void Write(IEnumerable<Guid> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<Guid> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
         }
 
         /// <summary>Adds a date time to the packet.</summary>
@@ -205,11 +335,37 @@ namespace MultiplayerProtocol
             Write((value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime()).ToBinary());
         }
 
+        public void Write(IEnumerable<DateTime> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<DateTime> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds a NamespacedKey to the packet.</summary>
         /// <param name="value">The NamespacedKey to add.</param>
         public void Write(NamespacedKey value)
         {
             Write(value.ToString());
+        }
+
+        public void Write(IEnumerable<NamespacedKey> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<NamespacedKey> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
         }
 
         /// <summary>Adds a Quaternion to the packet.</summary>
@@ -222,6 +378,19 @@ namespace MultiplayerProtocol
             Write(value.w);
         }
 
+        public void Write(IEnumerable<Quaternion> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<Quaternion> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds a Vector4 to the packet.</summary>
         /// <param name="value">The Vector4 to add.</param>
         public void Write(Vector4 value)
@@ -230,6 +399,19 @@ namespace MultiplayerProtocol
             Write(value.y);
             Write(value.z);
             Write(value.w);
+        }
+
+        public void Write(IEnumerable<Vector4> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<Vector4> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
         }
 
         /// <summary>Adds a Vector3 to the packet.</summary>
@@ -241,12 +423,38 @@ namespace MultiplayerProtocol
             Write(value.z);
         }
 
+        public void Write(IEnumerable<Vector3> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<Vector3> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds a Vector2 to the packet.</summary>
         /// <param name="value">The Vector2 to add.</param>
         public void Write(Vector2 value)
         {
             Write(value.x);
             Write(value.y);
+        }
+
+        public void Write(IEnumerable<Vector2> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<Vector2> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
         }
 
         /// <summary>Adds a Vector3Int to the packet.</summary>
@@ -258,12 +466,38 @@ namespace MultiplayerProtocol
             Write(value.z);
         }
 
+        public void Write(IEnumerable<Vector3Int> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<Vector3Int> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds a Vector2Int to the packet.</summary>
         /// <param name="value">The Vector2Int to add.</param>
         public void Write(Vector2Int value)
         {
             Write(value.x);
             Write(value.y);
+        }
+
+        public void Write(IEnumerable<Vector2Int> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<Vector2Int> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
         }
 
         /// <summary>Adds a JToken to the packet.</summary>
@@ -375,6 +609,17 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'short'!");
         }
 
+        public short[] ReadShortArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<short>();
+            var result = new short[length];
+            for (var i = 0; i < length; i++) result[i] = ReadShort();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
         /// <summary>Reads a ushort from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public ushort ReadUShort(bool moveReadPos = true)
@@ -393,6 +638,17 @@ namespace MultiplayerProtocol
             }
 
             throw new Exception("Could not read value of type 'ushort'!");
+        }
+
+        public ushort[] ReadUShortArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<ushort>();
+            var result = new ushort[length];
+            for (var i = 0; i < length; i++) result[i] = ReadUShort();
+            if (!moveReadPos) _readPos = position;
+            return result;
         }
 
         /// <summary>Reads an int from the packet.</summary>
@@ -415,6 +671,17 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'int'!");
         }
 
+        public int[] ReadIntArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<int>();
+            var result = new int[length];
+            for (var i = 0; i < length; i++) result[i] = ReadInt();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
         /// <summary>Reads an uint from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public uint ReadUInt(bool moveReadPos = true)
@@ -433,6 +700,17 @@ namespace MultiplayerProtocol
             }
 
             throw new Exception("Could not read value of type 'uint'!");
+        }
+
+        public uint[] ReadUIntArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<uint>();
+            var result = new uint[length];
+            for (var i = 0; i < length; i++) result[i] = ReadUInt();
+            if (!moveReadPos) _readPos = position;
+            return result;
         }
 
         /// <summary>Reads a long from the packet.</summary>
@@ -455,6 +733,17 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'long'!");
         }
 
+        public long[] ReadLongArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<long>();
+            var result = new long[length];
+            for (var i = 0; i < length; i++) result[i] = ReadLong();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
         /// <summary>Reads a ulong from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public ulong ReadULong(bool moveReadPos = true)
@@ -473,6 +762,17 @@ namespace MultiplayerProtocol
             }
 
             throw new Exception("Could not read value of type 'ulong'!");
+        }
+
+        public ulong[] ReadULongArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<ulong>();
+            var result = new ulong[length];
+            for (var i = 0; i < length; i++) result[i] = ReadULong();
+            if (!moveReadPos) _readPos = position;
+            return result;
         }
 
         /// <summary>Reads a float from the packet.</summary>
@@ -495,6 +795,17 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'float'!");
         }
 
+        public float[] ReadFloatArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<float>();
+            var result = new float[length];
+            for (var i = 0; i < length; i++) result[i] = ReadFloat();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
         /// <summary>Reads a bool from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public bool ReadBool(bool moveReadPos = true)
@@ -513,6 +824,17 @@ namespace MultiplayerProtocol
             }
 
             throw new Exception("Could not read value of type 'bool'!");
+        }
+
+        public bool[] ReadBoolArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<bool>();
+            var result = new bool[length];
+            for (var i = 0; i < length; i++) result[i] = ReadBool();
+            if (!moveReadPos) _readPos = position;
+            return result;
         }
 
         /// <summary>Reads a string from the packet.</summary>
@@ -545,6 +867,17 @@ namespace MultiplayerProtocol
             }
         }
 
+        public string[] ReadStrings(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<string>();
+            var result = new string[length];
+            for (var i = 0; i < length; i++) result[i] = ReadString();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
         /// <summary>Reads a guid from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public Guid ReadGuid(bool moveReadPos = true)
@@ -553,11 +886,33 @@ namespace MultiplayerProtocol
             return stringValue != null && Guid.TryParse(stringValue, out var result) ? result : default;
         }
 
+        public Guid[] ReadGuids(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<Guid>();
+            var result = new Guid[length];
+            for (var i = 0; i < length; i++) result[i] = ReadGuid();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
         /// <summary>Reads a date time from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public DateTime ReadDateTime(bool moveReadPos = true)
         {
             return DateTime.FromBinary(ReadLong(moveReadPos));
+        }
+
+        public DateTime[] ReadDateTimes(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<DateTime>();
+            var result = new DateTime[length];
+            for (var i = 0; i < length; i++) result[i] = ReadDateTime();
+            if (!moveReadPos) _readPos = position;
+            return result;
         }
 
         /// <summary>Reads a namespaced key from the packet.</summary>
@@ -569,6 +924,17 @@ namespace MultiplayerProtocol
             var key = ReadString();
             if (!moveReadPos) _readPos = position;
             return new NamespacedKey(nameSpace, key);
+        }
+
+        public NamespacedKey[] ReadNamespacedKeys(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<NamespacedKey>();
+            var result = new NamespacedKey[length];
+            for (var i = 0; i < length; i++) result[i] = ReadNamespacedKey();
+            if (!moveReadPos) _readPos = position;
+            return result;
         }
 
         /// <summary>Reads a quaternion from the packet.</summary>
@@ -584,6 +950,17 @@ namespace MultiplayerProtocol
             return new Quaternion(x, y, z, w);
         }
 
+        public Quaternion[] ReadQuaternions(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<Quaternion>();
+            var result = new Quaternion[length];
+            for (var i = 0; i < length; i++) result[i] = ReadQuaternion();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
         /// <summary>Reads a Vector2Int from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public Vector2Int ReadVector2Int(bool moveReadPos = true)
@@ -595,6 +972,17 @@ namespace MultiplayerProtocol
             return new Vector2Int(x, y);
         }
 
+        public Vector2Int[] ReadVector2IntArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<Vector2Int>();
+            var result = new Vector2Int[length];
+            for (var i = 0; i < length; i++) result[i] = ReadVector2Int();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
         /// <summary>Reads a Vector2 from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public Vector2 ReadVector2(bool moveReadPos = true)
@@ -604,6 +992,17 @@ namespace MultiplayerProtocol
             var y = ReadFloat();
             if (!moveReadPos) _readPos = position;
             return new Vector2(x, y);
+        }
+
+        public Vector2[] ReadVector2Array(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<Vector2>();
+            var result = new Vector2[length];
+            for (var i = 0; i < length; i++) result[i] = ReadVector2();
+            if (!moveReadPos) _readPos = position;
+            return result;
         }
 
         /// <summary>Reads a Vector3Int from the packet.</summary>
@@ -618,6 +1017,17 @@ namespace MultiplayerProtocol
             return new Vector3Int(x, y, z);
         }
 
+        public Vector3Int[] ReadVector3IntArray(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<Vector3Int>();
+            var result = new Vector3Int[length];
+            for (var i = 0; i < length; i++) result[i] = ReadVector3Int();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
         /// <summary>Reads a Vector3 from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public Vector3 ReadVector3(bool moveReadPos = true)
@@ -628,6 +1038,17 @@ namespace MultiplayerProtocol
             var z = ReadFloat();
             if (!moveReadPos) _readPos = position;
             return new Vector3(x, y, z);
+        }
+
+        public Vector3[] ReadVector3Array(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<Vector3>();
+            var result = new Vector3[length];
+            for (var i = 0; i < length; i++) result[i] = ReadVector3();
+            if (!moveReadPos) _readPos = position;
+            return result;
         }
 
         /// <summary>Reads a Vector4 from the packet.</summary>
@@ -641,6 +1062,17 @@ namespace MultiplayerProtocol
             var w = ReadFloat();
             if (!moveReadPos) _readPos = position;
             return new Vector4(x, y, z, w);
+        }
+
+        public Vector4[] ReadVector4Array(bool moveReadPos)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0) return Array.Empty<Vector4>();
+            var result = new Vector4[length];
+            for (var i = 0; i < length; i++) result[i] = ReadVector4();
+            if (!moveReadPos) _readPos = position;
+            return result;
         }
 
         /// <summary>Reads a JObject from the packet.</summary>
