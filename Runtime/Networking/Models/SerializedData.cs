@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Essentials;
 using GZipCompress;
@@ -278,6 +279,34 @@ namespace MultiplayerProtocol
         public void Write(ISerializableValue value)
         {
             value.SerializeInto(this);
+        }
+
+        /// <summary>Adds a collection of serializable values to the packet.</summary>
+        /// <param name="value">The serializable values to add.</param>
+        public void Write<T>([CanBeNull] IEnumerable<T> value) where T : ISerializableValue, new()
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            var list = value.ToArray();
+            var length = list.Length;
+            Write(length);
+            if (length == 0) return;
+
+            var raw = new SerializedData();
+            foreach (var item in list)
+            {
+                raw.Write(item != null);
+                if (item == null) continue;
+                item.SerializeInto(raw);
+            }
+
+            var compressed = GZipCompressor.Compress(raw.ToArray());
+            Write(compressed.Length);
+            Write(compressed);
         }
 
         #endregion
@@ -656,6 +685,32 @@ namespace MultiplayerProtocol
             var result = new T();
             result.DeserializeFrom(this);
             return result;
+        }
+
+        /// <summary>Reads a serialized array from the packet.</summary>
+        [NotNull]
+        [ItemCanBeNull]
+        public T[] ReadArray<T>() where T : ISerializableValue, new()
+        {
+            var length = ReadInt();
+            if (length == 0)
+            {
+                return Array.Empty<T>();
+            }
+
+            var rawLength = ReadInt();
+            var compressed = ReadBytes(rawLength);
+            var raw = new SerializedData(GZipCompressor.Decompress(compressed));
+            var value = new T[length];
+            for (var i = 0; i < length; i++)
+            {
+                if (!raw.ReadBool()) continue;
+                var entry = new T();
+                entry.DeserializeFrom(raw);
+                value[i] = entry;
+            }
+
+            return value;
         }
 
         #endregion
