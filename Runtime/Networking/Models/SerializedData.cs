@@ -16,6 +16,8 @@ namespace MultiplayerProtocol
         private byte[] _readableBuffer;
         private int _readPos;
 
+        private byte[] readableBuffer => _readableBuffer ?? ToArray();
+
         /// <summary>Creates a new empty packet (without an ID).</summary>
         public SerializedData()
         {
@@ -554,7 +556,7 @@ namespace MultiplayerProtocol
             if (_buffer.Count > _readPos)
             {
                 // If there are unread bytes
-                byte value = _readableBuffer[_readPos]; // Get the byte at readPos' position
+                byte value = readableBuffer[_readPos]; // Get the byte at readPos' position
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true
@@ -596,7 +598,7 @@ namespace MultiplayerProtocol
             if (_buffer.Count > _readPos)
             {
                 // If there are unread bytes
-                short value = BitConverter.ToInt16(_readableBuffer, _readPos); // Convert the bytes to a short
+                short value = BitConverter.ToInt16(readableBuffer, _readPos); // Convert the bytes to a short
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true and there are unread bytes
@@ -618,6 +620,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<short>();
             }
+
             var result = new short[length];
             for (var i = 0; i < length; i++) result[i] = ReadShort();
             if (!moveReadPos) _readPos = position;
@@ -631,7 +634,7 @@ namespace MultiplayerProtocol
             if (_buffer.Count > _readPos)
             {
                 // If there are unread bytes
-                ushort value = BitConverter.ToUInt16(_readableBuffer, _readPos); // Convert the bytes to a short
+                ushort value = BitConverter.ToUInt16(readableBuffer, _readPos); // Convert the bytes to a short
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true and there are unread bytes
@@ -653,6 +656,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<ushort>();
             }
+
             var result = new ushort[length];
             for (var i = 0; i < length; i++) result[i] = ReadUShort();
             if (!moveReadPos) _readPos = position;
@@ -666,7 +670,7 @@ namespace MultiplayerProtocol
             if (_buffer.Count > _readPos)
             {
                 // If there are unread bytes
-                int value = BitConverter.ToInt32(_readableBuffer, _readPos); // Convert the bytes to an int
+                int value = BitConverter.ToInt32(readableBuffer, _readPos); // Convert the bytes to an int
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true
@@ -688,6 +692,8 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<int>();
             }
+
+            Debug.Log("Length: " + length);
             var result = new int[length];
             for (var i = 0; i < length; i++) result[i] = ReadInt();
             if (!moveReadPos) _readPos = position;
@@ -701,7 +707,7 @@ namespace MultiplayerProtocol
             if (_buffer.Count > _readPos)
             {
                 // If there are unread bytes
-                uint value = BitConverter.ToUInt32(_readableBuffer, _readPos); // Convert the bytes to an uint
+                uint value = BitConverter.ToUInt32(readableBuffer, _readPos); // Convert the bytes to an uint
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true
@@ -723,6 +729,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<uint>();
             }
+
             var result = new uint[length];
             for (var i = 0; i < length; i++) result[i] = ReadUInt();
             if (!moveReadPos) _readPos = position;
@@ -736,7 +743,7 @@ namespace MultiplayerProtocol
             if (_buffer.Count > _readPos)
             {
                 // If there are unread bytes
-                long value = BitConverter.ToInt64(_readableBuffer, _readPos); // Convert the bytes to a long
+                long value = BitConverter.ToInt64(readableBuffer, _readPos); // Convert the bytes to a long
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true
@@ -758,6 +765,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<long>();
             }
+
             var result = new long[length];
             for (var i = 0; i < length; i++) result[i] = ReadLong();
             if (!moveReadPos) _readPos = position;
@@ -771,7 +779,7 @@ namespace MultiplayerProtocol
             if (_buffer.Count > _readPos)
             {
                 // If there are unread bytes
-                ulong value = BitConverter.ToUInt64(_readableBuffer, _readPos); // Convert the bytes to au long
+                ulong value = BitConverter.ToUInt64(readableBuffer, _readPos); // Convert the bytes to au long
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true
@@ -793,6 +801,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<ulong>();
             }
+
             var result = new ulong[length];
             for (var i = 0; i < length; i++) result[i] = ReadULong();
             if (!moveReadPos) _readPos = position;
@@ -806,7 +815,7 @@ namespace MultiplayerProtocol
             if (_buffer.Count > _readPos)
             {
                 // If there are unread bytes
-                float value = BitConverter.ToSingle(_readableBuffer, _readPos); // Convert the bytes to a float
+                float value = BitConverter.ToSingle(readableBuffer, _readPos); // Convert the bytes to a float
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true
@@ -828,6 +837,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<float>();
             }
+
             var result = new float[length];
             for (var i = 0; i < length; i++) result[i] = ReadFloat();
             if (!moveReadPos) _readPos = position;
@@ -841,7 +851,7 @@ namespace MultiplayerProtocol
             if (_buffer.Count > _readPos)
             {
                 // If there are unread bytes
-                bool value = BitConverter.ToBoolean(_readableBuffer, _readPos); // Convert the bytes to a bool
+                bool value = BitConverter.ToBoolean(readableBuffer, _readPos); // Convert the bytes to a bool
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true
@@ -863,6 +873,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<bool>();
             }
+
             var result = new bool[length];
             for (var i = 0; i < length; i++) result[i] = ReadBool();
             if (!moveReadPos) _readPos = position;
@@ -884,7 +895,7 @@ namespace MultiplayerProtocol
                 if (length == 0) return "";
 
                 string value =
-                    Encoding.UTF8.GetString(_readableBuffer, _readPos, length); // Convert the bytes to a string
+                    Encoding.UTF8.GetString(readableBuffer, _readPos, length); // Convert the bytes to a string
                 if (moveReadPos)
                 {
                     // If _moveReadPos is true string is not empty
@@ -908,6 +919,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<string>();
             }
+
             var result = new string[length];
             for (var i = 0; i < length; i++) result[i] = ReadString();
             if (!moveReadPos) _readPos = position;
@@ -931,6 +943,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<Guid>();
             }
+
             var result = new Guid[length];
             for (var i = 0; i < length; i++) result[i] = ReadGuid();
             if (!moveReadPos) _readPos = position;
@@ -953,6 +966,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<DateTime>();
             }
+
             var result = new DateTime[length];
             for (var i = 0; i < length; i++) result[i] = ReadDateTime();
             if (!moveReadPos) _readPos = position;
@@ -979,6 +993,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<NamespacedKey>();
             }
+
             var result = new NamespacedKey[length];
             for (var i = 0; i < length; i++) result[i] = ReadNamespacedKey();
             if (!moveReadPos) _readPos = position;
@@ -1007,6 +1022,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<Quaternion>();
             }
+
             var result = new Quaternion[length];
             for (var i = 0; i < length; i++) result[i] = ReadQuaternion();
             if (!moveReadPos) _readPos = position;
@@ -1033,6 +1049,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<Vector2Int>();
             }
+
             var result = new Vector2Int[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector2Int();
             if (!moveReadPos) _readPos = position;
@@ -1059,6 +1076,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<Vector2>();
             }
+
             var result = new Vector2[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector2();
             if (!moveReadPos) _readPos = position;
@@ -1086,6 +1104,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<Vector3Int>();
             }
+
             var result = new Vector3Int[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector3Int();
             if (!moveReadPos) _readPos = position;
@@ -1113,6 +1132,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<Vector3>();
             }
+
             var result = new Vector3[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector3();
             if (!moveReadPos) _readPos = position;
@@ -1141,6 +1161,7 @@ namespace MultiplayerProtocol
                 if (!moveReadPos) _readPos = position;
                 return Array.Empty<Vector4>();
             }
+
             var result = new Vector4[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector4();
             if (!moveReadPos) _readPos = position;
