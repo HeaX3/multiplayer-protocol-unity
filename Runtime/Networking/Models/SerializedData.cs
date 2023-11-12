@@ -354,7 +354,8 @@ namespace MultiplayerProtocol
         /// <param name="value">The NamespacedKey to add.</param>
         public void Write(NamespacedKey value)
         {
-            Write(value.ToString());
+            Write(value.nameSpace);
+            Write(value.key);
         }
 
         public void Write(IEnumerable<NamespacedKey> value)
