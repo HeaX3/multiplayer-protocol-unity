@@ -609,11 +609,15 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'short'!");
         }
 
-        public short[] ReadShortArray(bool moveReadPos)
+        public short[] ReadShortArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<short>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<short>();
+            }
             var result = new short[length];
             for (var i = 0; i < length; i++) result[i] = ReadShort();
             if (!moveReadPos) _readPos = position;
@@ -640,11 +644,15 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'ushort'!");
         }
 
-        public ushort[] ReadUShortArray(bool moveReadPos)
+        public ushort[] ReadUShortArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<ushort>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<ushort>();
+            }
             var result = new ushort[length];
             for (var i = 0; i < length; i++) result[i] = ReadUShort();
             if (!moveReadPos) _readPos = position;
@@ -671,11 +679,15 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'int'!");
         }
 
-        public int[] ReadIntArray(bool moveReadPos)
+        public int[] ReadIntArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<int>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<int>();
+            }
             var result = new int[length];
             for (var i = 0; i < length; i++) result[i] = ReadInt();
             if (!moveReadPos) _readPos = position;
@@ -702,11 +714,15 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'uint'!");
         }
 
-        public uint[] ReadUIntArray(bool moveReadPos)
+        public uint[] ReadUIntArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<uint>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<uint>();
+            }
             var result = new uint[length];
             for (var i = 0; i < length; i++) result[i] = ReadUInt();
             if (!moveReadPos) _readPos = position;
@@ -733,11 +749,15 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'long'!");
         }
 
-        public long[] ReadLongArray(bool moveReadPos)
+        public long[] ReadLongArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<long>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<long>();
+            }
             var result = new long[length];
             for (var i = 0; i < length; i++) result[i] = ReadLong();
             if (!moveReadPos) _readPos = position;
@@ -764,11 +784,15 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'ulong'!");
         }
 
-        public ulong[] ReadULongArray(bool moveReadPos)
+        public ulong[] ReadULongArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<ulong>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<ulong>();
+            }
             var result = new ulong[length];
             for (var i = 0; i < length; i++) result[i] = ReadULong();
             if (!moveReadPos) _readPos = position;
@@ -795,11 +819,15 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'float'!");
         }
 
-        public float[] ReadFloatArray(bool moveReadPos)
+        public float[] ReadFloatArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<float>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<float>();
+            }
             var result = new float[length];
             for (var i = 0; i < length; i++) result[i] = ReadFloat();
             if (!moveReadPos) _readPos = position;
@@ -826,11 +854,15 @@ namespace MultiplayerProtocol
             throw new Exception("Could not read value of type 'bool'!");
         }
 
-        public bool[] ReadBoolArray(bool moveReadPos)
+        public bool[] ReadBoolArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<bool>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<bool>();
+            }
             var result = new bool[length];
             for (var i = 0; i < length; i++) result[i] = ReadBool();
             if (!moveReadPos) _readPos = position;
@@ -867,11 +899,15 @@ namespace MultiplayerProtocol
             }
         }
 
-        public string[] ReadStrings(bool moveReadPos)
+        public string[] ReadStrings(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<string>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<string>();
+            }
             var result = new string[length];
             for (var i = 0; i < length; i++) result[i] = ReadString();
             if (!moveReadPos) _readPos = position;
@@ -886,11 +922,15 @@ namespace MultiplayerProtocol
             return stringValue != null && Guid.TryParse(stringValue, out var result) ? result : default;
         }
 
-        public Guid[] ReadGuids(bool moveReadPos)
+        public Guid[] ReadGuids(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<Guid>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<Guid>();
+            }
             var result = new Guid[length];
             for (var i = 0; i < length; i++) result[i] = ReadGuid();
             if (!moveReadPos) _readPos = position;
@@ -904,11 +944,15 @@ namespace MultiplayerProtocol
             return DateTime.FromBinary(ReadLong(moveReadPos));
         }
 
-        public DateTime[] ReadDateTimes(bool moveReadPos)
+        public DateTime[] ReadDateTimes(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<DateTime>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<DateTime>();
+            }
             var result = new DateTime[length];
             for (var i = 0; i < length; i++) result[i] = ReadDateTime();
             if (!moveReadPos) _readPos = position;
@@ -926,11 +970,15 @@ namespace MultiplayerProtocol
             return new NamespacedKey(nameSpace, key);
         }
 
-        public NamespacedKey[] ReadNamespacedKeys(bool moveReadPos)
+        public NamespacedKey[] ReadNamespacedKeys(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<NamespacedKey>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<NamespacedKey>();
+            }
             var result = new NamespacedKey[length];
             for (var i = 0; i < length; i++) result[i] = ReadNamespacedKey();
             if (!moveReadPos) _readPos = position;
@@ -950,11 +998,15 @@ namespace MultiplayerProtocol
             return new Quaternion(x, y, z, w);
         }
 
-        public Quaternion[] ReadQuaternions(bool moveReadPos)
+        public Quaternion[] ReadQuaternions(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<Quaternion>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<Quaternion>();
+            }
             var result = new Quaternion[length];
             for (var i = 0; i < length; i++) result[i] = ReadQuaternion();
             if (!moveReadPos) _readPos = position;
@@ -972,11 +1024,15 @@ namespace MultiplayerProtocol
             return new Vector2Int(x, y);
         }
 
-        public Vector2Int[] ReadVector2IntArray(bool moveReadPos)
+        public Vector2Int[] ReadVector2IntArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<Vector2Int>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<Vector2Int>();
+            }
             var result = new Vector2Int[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector2Int();
             if (!moveReadPos) _readPos = position;
@@ -994,11 +1050,15 @@ namespace MultiplayerProtocol
             return new Vector2(x, y);
         }
 
-        public Vector2[] ReadVector2Array(bool moveReadPos)
+        public Vector2[] ReadVector2Array(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<Vector2>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<Vector2>();
+            }
             var result = new Vector2[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector2();
             if (!moveReadPos) _readPos = position;
@@ -1017,11 +1077,15 @@ namespace MultiplayerProtocol
             return new Vector3Int(x, y, z);
         }
 
-        public Vector3Int[] ReadVector3IntArray(bool moveReadPos)
+        public Vector3Int[] ReadVector3IntArray(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<Vector3Int>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<Vector3Int>();
+            }
             var result = new Vector3Int[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector3Int();
             if (!moveReadPos) _readPos = position;
@@ -1040,11 +1104,15 @@ namespace MultiplayerProtocol
             return new Vector3(x, y, z);
         }
 
-        public Vector3[] ReadVector3Array(bool moveReadPos)
+        public Vector3[] ReadVector3Array(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<Vector3>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<Vector3>();
+            }
             var result = new Vector3[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector3();
             if (!moveReadPos) _readPos = position;
@@ -1064,11 +1132,15 @@ namespace MultiplayerProtocol
             return new Vector4(x, y, z, w);
         }
 
-        public Vector4[] ReadVector4Array(bool moveReadPos)
+        public Vector4[] ReadVector4Array(bool moveReadPos = true)
         {
             var position = _readPos;
             var length = ReadInt();
-            if (length == 0) return Array.Empty<Vector4>();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<Vector4>();
+            }
             var result = new Vector4[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector4();
             if (!moveReadPos) _readPos = position;
