@@ -911,8 +911,9 @@ namespace MultiplayerProtocol
 
                 return value; // Return the string
             }
-            catch
+            catch(Exception e)
             {
+                Debug.LogError(e);
                 throw new Exception("Could not read value of type 'string'!");
             }
         }
