@@ -292,6 +292,12 @@ namespace MultiplayerProtocol
                 return;
             }
 
+            if (value.Length == 0)
+            {
+                Write(0);
+                return;
+            }
+
             var bytes = Encoding.UTF8.GetBytes(value);
             Write(bytes.Length); // Add the length of the string to the packet
             _buffer.AddRange(bytes); // Add the string itself
@@ -887,7 +893,7 @@ namespace MultiplayerProtocol
         {
             try
             {
-                int length = ReadInt(); // Get the length of the string
+                var length = ReadInt(moveReadPos); // Get the length of the string
                 if (length < 0)
                 {
                     return null;
@@ -895,7 +901,7 @@ namespace MultiplayerProtocol
 
                 if (length == 0) return "";
 
-                string value =
+                var value =
                     Encoding.UTF8.GetString(readableBuffer, _readPos, length); // Convert the bytes to a string
                 if (moveReadPos)
                 {
