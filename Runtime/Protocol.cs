@@ -173,11 +173,7 @@ namespace MultiplayerProtocol
             }
 
             var result = new SerializedData(messageId);
-            foreach (var value in message.values)
-            {
-                value.SerializeInto(result);
-            }
-
+            message.SerializeInto(result);
             return result;
         }
 
