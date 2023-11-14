@@ -1,4 +1,5 @@
 ﻿using System;
+using GZipCompress;
 using JetBrains.Annotations;
 
 namespace MultiplayerProtocol
@@ -7,7 +8,7 @@ namespace MultiplayerProtocol
     {
         public Guid requestId { get; private set; }
         public ushort messageId { get; private set; }
-        private INetworkMessage message { get; }
+        public SerializedData message { get; private set; }
 
         public RequestMessage()
         {
@@ -17,20 +18,39 @@ namespace MultiplayerProtocol
         {
             requestId = Guid.NewGuid();
             this.messageId = messageId;
-            this.message = message;
+            this.message = message.Serialize();
         }
 
         public void SerializeInto(SerializedData message)
         {
             message.Write(requestId);
             message.Write(messageId);
-            message.Write(this.message); // Note: message is deserialized separately on the receiving end
+            var data = this.message.ToArray();
+            if (data.Length == 0)
+            {
+                message.Write(0);
+                return;
+            }
+
+            var compressed = GZipCompressor.Compress(data);
+            message.Write(compressed.Length);
+            message.Write(compressed);
         }
 
         public void DeserializeFrom(SerializedData message)
         {
             requestId = message.ReadGuid();
             messageId = message.ReadUShort();
+            var compressedLength = message.ReadInt();
+            if (compressedLength == 0)
+            {
+                this.message = new SerializedData(Array.Empty<byte>());
+                return;
+            }
+
+            var compressed = message.ReadBytes(compressedLength);
+            var data = GZipCompressor.Decompress(compressed);
+            this.message = new SerializedData(data);
         }
     }
 }

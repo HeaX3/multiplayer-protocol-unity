@@ -25,7 +25,7 @@ namespace MultiplayerProtocol
         {
             get
             {
-                _protocol ??= new Protocol(handlers
+                _protocol ??= new Protocol(GetType().Name, handlers
                     .Prepend(new ErrorHandler(this))
                     .Prepend(new RequestMessageHandler(this))
                     .Prepend(new ResponseMessageHandler(this))

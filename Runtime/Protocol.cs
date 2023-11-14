@@ -13,6 +13,8 @@ namespace MultiplayerProtocol
     {
         public const uint DefaultTimeoutMs = 5000;
 
+        public string name { get; }
+
         private readonly Dictionary<Type, ushort> idMap = new();
         private readonly Dictionary<ushort, INetworkMessageListener> handlers = new();
         private readonly Dictionary<INetworkMessageListener, ushort> handlerIdMap = new();
@@ -24,8 +26,9 @@ namespace MultiplayerProtocol
 
         public bool partnerProtocolReceived => partnerProtocol.Count > 0;
 
-        internal Protocol(IEnumerable<INetworkMessageListener> handlers)
+        internal Protocol(string name, IEnumerable<INetworkMessageListener> handlers)
         {
+            this.name = name;
             var list = handlers.ToList();
             for (var i = 0; i < list.Count; i++)
             {
@@ -54,6 +57,9 @@ namespace MultiplayerProtocol
         public bool IsThreadSafeMessage(ushort messageId) => threadSafeMessageIds.Contains(messageId);
 
         internal bool TryGetMessageId(Type type, out ushort messageId) => idMap.TryGetValue(type, out messageId);
+
+        internal bool TryGetMessageHandler(ushort typeId, out INetworkMessageListener handler) =>
+            handlers.TryGetValue(typeId, out handler);
 
         internal bool TryGetPartnerMessageId([NotNull] Type type, out ushort messageId)
         {
@@ -119,6 +125,28 @@ namespace MultiplayerProtocol
                 return;
             }
 
+            Handle(message, listener);
+        }
+
+        public void Handle(INetworkMessage message)
+        {
+            if (!idMap.TryGetValue(message.GetType(), out var messageId))
+            {
+                Debug.LogError("Unknown message type " + message.GetType().Name);
+                return;
+            }
+
+            if (!handlers.TryGetValue(messageId, out var handler))
+            {
+                Debug.LogError("Handler for message type id " + messageId + " missing");
+                return;
+            }
+
+            Handle(message, handler);
+        }
+
+        private void Handle(INetworkMessage message, INetworkMessageListener listener)
+        {
             if (listener is IRateLimited rateLimited)
             {
                 var tracker = CleanTracker(GetRateLimitTracker(rateLimited));
@@ -135,7 +163,7 @@ namespace MultiplayerProtocol
 
             if (listener is INetworkMessageHandler simpleHandler)
             {
-                simpleHandler.Handle(message, serializedMessage);
+                simpleHandler.Handle(message);
             }
             else if (listener is INetworkRequestHandler or IAsyncNetworkRequestHandler)
             {

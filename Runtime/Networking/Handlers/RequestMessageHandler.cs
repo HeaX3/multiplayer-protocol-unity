@@ -10,16 +10,21 @@ namespace MultiplayerProtocol
         {
         }
 
-        public void Handle(RequestMessage message, SerializedData serializedMessage)
+        public void Handle(RequestMessage message)
         {
-            var payload = protocol.Deserialize(serializedMessage, message.messageId, out var handler);
+            // Debug.Log(connection.protocol.name + ": Going to deserialize the actual request message of type " +
+            //           (connection.protocol.TryGetMessageHandler(message.messageId, out var h)
+            //               ? h.messageType.Name
+            //               : "Unknown type"));
+            var payload = protocol.Deserialize(message.message, message.messageId, out var handler);
+            // Debug.Log(connection.protocol.name + ": Deserialized message is " + payload.GetType().Name);
             if (handler is INetworkMessageHandler simpleHandler)
             {
-                simpleHandler.Handle(payload, serializedMessage);
+                simpleHandler.Handle(payload);
             }
             else if (handler is INetworkRequestHandler requestHandler)
             {
-                var response = requestHandler.Handle(payload, serializedMessage);
+                var response = requestHandler.Handle(payload);
                 connection.responseSender.SendResponse(message.requestId, response);
             }
             else if (handler is IAsyncNetworkRequestHandler asyncHandler)
@@ -29,7 +34,7 @@ namespace MultiplayerProtocol
                     RequestResponse.RequestTimeout()
                 ), asyncHandler.maxTimeoutMs);
 
-                asyncHandler.Handle(payload, serializedMessage).Then(response =>
+                asyncHandler.Handle(payload).Then(response =>
                 {
                     if (timeout.isCancelled) return;
                     timeout.Cancel();
@@ -49,12 +54,6 @@ namespace MultiplayerProtocol
                     );
                 });
             }
-        }
-
-        public void Handle(RequestMessage message)
-        {
-            // Will not run due to the override above
-            throw new System.InvalidOperationException();
         }
 
         void INetworkMessageListener.Reject(INetworkMessage message, Exception e)

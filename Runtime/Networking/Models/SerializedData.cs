@@ -519,8 +519,10 @@ namespace MultiplayerProtocol
 
         /// <summary>Adds a serializable value to the packet.</summary>
         /// <param name="value">The serializable value to add.</param>
-        public void Write([NotNull] ISerializableValue value)
+        public void Write<T>([CanBeNull] T value) where T : ISerializableValue
         {
+            Write(value != null);
+            if (value == null) return;
             value.SerializeInto(this);
         }
 
@@ -552,7 +554,7 @@ namespace MultiplayerProtocol
             Write(compressed);
         }
 
-        public void Write<T>(T value) where T : struct, Enum
+        public void WriteEnum<T>(T value) where T : struct, Enum
         {
             Write((int)(object)value);
         }
@@ -896,15 +898,21 @@ namespace MultiplayerProtocol
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public string ReadString(bool moveReadPos = true)
         {
+            var readPos = _readPos;
+            var length = ReadInt(); // Get the length of the string
             try
             {
-                var length = ReadInt(moveReadPos); // Get the length of the string
                 if (length < 0)
                 {
+                    if (!moveReadPos) _readPos = readPos;
                     return null;
                 }
 
-                if (length == 0) return "";
+                if (length == 0)
+                {
+                    if (!moveReadPos) _readPos = readPos;
+                    return "";
+                }
 
                 var value =
                     Encoding.UTF8.GetString(readableBuffer, _readPos, length); // Convert the bytes to a string
@@ -919,7 +927,10 @@ namespace MultiplayerProtocol
             catch (Exception e)
             {
                 Debug.LogError(e);
-                throw new Exception("Could not read value of type 'string'!");
+                var decodedValue = Encoding.UTF8.GetString(readableBuffer, _readPos, readableBuffer.Length - _readPos);
+                Debug.LogError("Decoded length: " + decodedValue.Length + " Attempted display: " + decodedValue);
+                throw new Exception("Could not read value of type 'string' (Expected length: " + length +
+                                    ", Available length: " + (readableBuffer.Length - _readPos) + ")!");
             }
         }
 
@@ -1218,10 +1229,16 @@ namespace MultiplayerProtocol
         }
 
         /// <summary>Reads a serialized value from the packet.</summary>
-        [NotNull]
+        [CanBeNull]
         public T Read<T>(bool moveReadPos = true) where T : ISerializableValue, new()
         {
             var readPos = _readPos;
+            if (!ReadBool())
+            {
+                if (!moveReadPos) _readPos = readPos;
+                return default;
+            }
+
             var result = new T();
             result.DeserializeFrom(this);
             if (!moveReadPos) _readPos = readPos;

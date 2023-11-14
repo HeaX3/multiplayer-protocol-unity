@@ -17,12 +17,12 @@ namespace MultiplayerProtocol
 
         public void SerializeInto(SerializedData message)
         {
-            message.Write(value);
+            message.Write(value, compress: true);
         }
 
         public void DeserializeFrom(SerializedData message)
         {
-            value = message.ReadJson();
+            value = message.ReadJson(decompress: true);
         }
     }
 }

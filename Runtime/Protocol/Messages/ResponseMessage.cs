@@ -38,7 +38,7 @@ namespace MultiplayerProtocol
         public void SerializeInto(SerializedData message)
         {
             message.Write(requestId);
-            message.Write(status);
+            message.WriteEnum(status);
             message.Write(preResponse != null);
             if (preResponse != null) message.Write(preResponse);
             message.Write(body?.Length ?? -1);
