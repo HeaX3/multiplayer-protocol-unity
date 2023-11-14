@@ -204,7 +204,7 @@ namespace MultiplayerProtocol
             }
 
             var result = handler.CreateMessageInstance();
-            foreach (var value in result.values) value.DeserializeFrom(message);
+            result.DeserializeFrom(message);
             return result;
         }
 
