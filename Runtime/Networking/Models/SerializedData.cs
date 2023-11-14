@@ -519,7 +519,7 @@ namespace MultiplayerProtocol
 
         /// <summary>Adds a serializable value to the packet.</summary>
         /// <param name="value">The serializable value to add.</param>
-        public void Write(ISerializableValue value)
+        public void Write([NotNull] ISerializableValue value)
         {
             value.SerializeInto(this);
         }
@@ -911,7 +911,7 @@ namespace MultiplayerProtocol
 
                 return value; // Return the string
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.LogError(e);
                 throw new Exception("Could not read value of type 'string'!");
@@ -1213,6 +1213,7 @@ namespace MultiplayerProtocol
         }
 
         /// <summary>Reads a serialized value from the packet.</summary>
+        [NotNull]
         public T Read<T>() where T : ISerializableValue, new()
         {
             var result = new T();
