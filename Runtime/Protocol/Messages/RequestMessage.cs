@@ -1,34 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace MultiplayerProtocol
 {
     public class RequestMessage : INetworkMessage
     {
-        public GuidValue requestId { get; } = new();
-        public UShortValue messageId { get; } = new();
-        private ISerializableValue value { get; }
+        public Guid requestId { get; private set; }
+        public ushort messageId { get; private set; }
+        private INetworkMessage message { get; }
 
         public RequestMessage()
         {
         }
 
-        public RequestMessage(ushort messageId, [NotNull] ISerializableValue value)
+        public RequestMessage(ushort messageId, [NotNull] INetworkMessage message)
         {
-            requestId.value = Guid.NewGuid();
-            this.messageId.value = messageId;
-            this.value = value;
+            requestId = Guid.NewGuid();
+            this.messageId = messageId;
+            this.message = message;
         }
 
-        public IEnumerable<ISerializableValue> values
+        public void SerializeInto(SerializedData message)
         {
-            get
-            {
-                yield return requestId;
-                yield return messageId;
-                if (value != default) yield return value;
-            }
+            message.Write(requestId);
+            message.Write(messageId);
+            message.Write(this.message); // Note: message is deserialized separately on the receiving end
+        }
+
+        public void DeserializeFrom(SerializedData message)
+        {
+            requestId = message.ReadGuid();
+            messageId = message.ReadUShort();
         }
     }
 }

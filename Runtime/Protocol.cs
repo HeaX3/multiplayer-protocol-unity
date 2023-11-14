@@ -249,7 +249,7 @@ namespace MultiplayerProtocol
 
                 if (DateTime.UtcNow > timeout)
                 {
-                    callback(new ResponseMessage(response.requestId.value, RequestResponse.RequestTimeout()));
+                    callback(new ResponseMessage(response.requestId, RequestResponse.RequestTimeout()));
                     return;
                 }
 

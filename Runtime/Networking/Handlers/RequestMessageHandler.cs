@@ -12,7 +12,7 @@ namespace MultiplayerProtocol
 
         public void Handle(RequestMessage message, SerializedData serializedMessage)
         {
-            var payload = protocol.Deserialize(serializedMessage, message.messageId.value, out var handler);
+            var payload = protocol.Deserialize(serializedMessage, message.messageId, out var handler);
             if (handler is INetworkMessageHandler simpleHandler)
             {
                 simpleHandler.Handle(payload, serializedMessage);
@@ -20,12 +20,12 @@ namespace MultiplayerProtocol
             else if (handler is INetworkRequestHandler requestHandler)
             {
                 var response = requestHandler.Handle(payload, serializedMessage);
-                connection.responseSender.SendResponse(message.requestId.value, response);
+                connection.responseSender.SendResponse(message.requestId, response);
             }
             else if (handler is IAsyncNetworkRequestHandler asyncHandler)
             {
                 var timeout = TaskScheduler.RunLater(() => connection.responseSender.SendResponse(
-                    message.requestId.value,
+                    message.requestId,
                     RequestResponse.RequestTimeout()
                 ), asyncHandler.maxTimeoutMs);
 
@@ -33,7 +33,7 @@ namespace MultiplayerProtocol
                 {
                     if (timeout.isCancelled) return;
                     timeout.Cancel();
-                    connection.responseSender.SendResponse(message.requestId.value, response);
+                    connection.responseSender.SendResponse(message.requestId, response);
                 }).Catch(e =>
                 {
                     if (timeout.isCancelled)
@@ -44,7 +44,7 @@ namespace MultiplayerProtocol
 
                     timeout.Cancel();
                     connection.responseSender.SendResponse(
-                        message.requestId.value,
+                        message.requestId,
                         e as IRequestResponse ?? new RequestResponse(StatusCode.InternalServerError, e)
                     );
                 });
@@ -70,7 +70,7 @@ namespace MultiplayerProtocol
             }
 
             connection.Send(new ResponseMessage(
-                request.requestId.value,
+                request.requestId,
                 e as RequestErrorResponse ?? (IRequestResponse)new RequestResponse(StatusCode.InternalServerError, e)
             ));
         }

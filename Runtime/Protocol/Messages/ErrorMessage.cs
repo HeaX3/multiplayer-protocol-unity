@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace MultiplayerProtocol
 {
     public class ErrorMessage : INetworkMessage
     {
-        public StringValue error { get; } = new();
-        public StringValue message { get; } = new();
+        public string error { get; private set; }
+        public string message { get; private set; }
 
         public ErrorMessage()
         {
@@ -14,17 +13,20 @@ namespace MultiplayerProtocol
 
         public ErrorMessage(Exception exception)
         {
-            error.value = exception.GetType().Name;
-            message.value = exception.Message;
+            error = exception.GetType().Name;
+            message = exception.Message;
         }
 
-        public IEnumerable<ISerializableValue> values
+        public void SerializeInto(SerializedData message)
         {
-            get
-            {
-                yield return error;
-                yield return message;
-            }
+            message.Write(error);
+            message.Write(this.message);
+        }
+
+        public void DeserializeFrom(SerializedData message)
+        {
+            error = message.ReadString();
+            this.message = message.ReadString();
         }
     }
 }

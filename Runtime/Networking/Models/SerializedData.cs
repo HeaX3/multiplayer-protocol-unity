@@ -552,6 +552,11 @@ namespace MultiplayerProtocol
             Write(compressed);
         }
 
+        public void Write<T>(T value) where T : struct, Enum
+        {
+            Write((int)(object)value);
+        }
+
         #endregion
 
         #region Read Data
@@ -1221,6 +1226,11 @@ namespace MultiplayerProtocol
             result.DeserializeFrom(this);
             if (!moveReadPos) _readPos = readPos;
             return result;
+        }
+
+        public T ReadEnum<T>(bool moveReadPos = true) where T : struct, Enum
+        {
+            return (T)(object)ReadInt(moveReadPos);
         }
 
         /// <summary>Reads a serialized array from the packet.</summary>

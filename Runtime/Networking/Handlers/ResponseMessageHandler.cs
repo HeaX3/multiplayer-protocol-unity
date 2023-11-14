@@ -10,9 +10,9 @@ namespace MultiplayerProtocol
 
         public void Handle(ResponseMessage message)
         {
-            if (!protocol.TryGetAndRemoveResponseListener(message.requestId.value, out var listener))
+            if (!protocol.TryGetAndRemoveResponseListener(message.requestId, out var listener))
             {
-                Debug.LogError("Protocol error: Received response for unknown request " + message.requestId.value);
+                Debug.LogError("Protocol error: Received response for unknown request " + message.requestId);
                 return;
             }
 

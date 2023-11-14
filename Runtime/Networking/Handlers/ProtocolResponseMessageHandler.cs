@@ -10,7 +10,7 @@ namespace MultiplayerProtocol
 
         public void Handle(ProtocolResponseMessage message)
         {
-            protocol.LoadData(message.value.value ?? new JObject());
+            protocol.LoadData(message.value ?? new JObject());
         }
     }
 }

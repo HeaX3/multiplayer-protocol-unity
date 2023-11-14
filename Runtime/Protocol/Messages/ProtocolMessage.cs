@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
 
 namespace MultiplayerProtocol
 {
     public class ProtocolMessage : INetworkMessage
     {
-        internal JsonValue value { get; } = new();
+        internal JObject value { get; private set; }
 
         public ProtocolMessage()
         {
@@ -12,12 +12,17 @@ namespace MultiplayerProtocol
 
         internal ProtocolMessage(Protocol protocol)
         {
-            value.value = protocol.ToJson();
+            value = protocol.ToJson();
         }
 
-        public IEnumerable<ISerializableValue> values
+        public void SerializeInto(SerializedData message)
         {
-            get { yield return value; }
+            message.Write(value);
+        }
+
+        public void DeserializeFrom(SerializedData message)
+        {
+            value = message.ReadJson();
         }
     }
 }

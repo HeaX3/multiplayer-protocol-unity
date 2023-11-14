@@ -16,17 +16,5 @@ namespace MultiplayerProtocol
             SerializeInto(serialized);
             return serialized.ToArray();
         }
-
-        IEnumerable<ISerializableValue> values { get; }
-
-        void ISerializableValue.SerializeInto(SerializedData message)
-        {
-            foreach (var value in values) value.SerializeInto(message);
-        }
-
-        void ISerializableValue.DeserializeFrom(SerializedData message)
-        {
-            foreach (var value in values) value.DeserializeFrom(message);
-        }
     }
 }
