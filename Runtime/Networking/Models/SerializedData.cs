@@ -1214,21 +1214,25 @@ namespace MultiplayerProtocol
 
         /// <summary>Reads a serialized value from the packet.</summary>
         [NotNull]
-        public T Read<T>() where T : ISerializableValue, new()
+        public T Read<T>(bool moveReadPos = true) where T : ISerializableValue, new()
         {
+            var readPos = _readPos;
             var result = new T();
             result.DeserializeFrom(this);
+            if (!moveReadPos) _readPos = readPos;
             return result;
         }
 
         /// <summary>Reads a serialized array from the packet.</summary>
         [NotNull]
         [ItemCanBeNull]
-        public T[] ReadArray<T>() where T : ISerializableValue, new()
+        public T[] ReadArray<T>(bool moveReadPos = true) where T : ISerializableValue, new()
         {
+            var readPos = _readPos;
             var length = ReadInt();
             if (length == 0)
             {
+                if (!moveReadPos) _readPos = readPos;
                 return Array.Empty<T>();
             }
 
@@ -1244,6 +1248,7 @@ namespace MultiplayerProtocol
                 value[i] = entry;
             }
 
+            if (!moveReadPos) _readPos = readPos;
             return value;
         }
 
