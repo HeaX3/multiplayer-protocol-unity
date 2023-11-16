@@ -122,6 +122,13 @@ namespace MultiplayerProtocol
             _buffer.AddRange(value);
         }
 
+        /// <summary>Adds a sbyte to the packet.</summary>
+        /// <param name="value">The sbyte to add.</param>
+        public void Write(sbyte value)
+        {
+            _buffer.Add((byte)(value + 128));
+        }
+
         /// <summary>Adds a short to the packet.</summary>
         /// <param name="value">The short to add.</param>
         public void Write(short value)
@@ -603,6 +610,26 @@ namespace MultiplayerProtocol
             }
 
             throw new Exception("Could not read value of type 'byte[]'!");
+        }
+
+        /// <summary>Reads a sbyte from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public sbyte ReadSByte(bool moveReadPos = true)
+        {
+            if (_buffer.Count > _readPos)
+            {
+                // If there are unread bytes
+                sbyte value = (sbyte)(readableBuffer[_readPos] - 128); // Get the byte at readPos' position
+                if (moveReadPos)
+                {
+                    // If _moveReadPos is true
+                    _readPos += 1; // Increase readPos by 1
+                }
+
+                return value; // Return the sbyte
+            }
+
+            throw new Exception("Could not read value of type 'sbyte'!");
         }
 
         /// <summary>Reads a short from the packet.</summary>
