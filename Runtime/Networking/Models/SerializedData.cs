@@ -516,6 +516,50 @@ namespace MultiplayerProtocol
             foreach (var item in valueArray) Write(item);
         }
 
+        public void Write(Keyframe value)
+        {
+            Write(value.value);
+            Write(value.time);
+            Write(value.inTangent);
+            Write(value.outTangent);
+            Write(value.inWeight);
+            Write(value.outWeight);
+        }
+
+        public void Write(IEnumerable<Keyframe> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<Keyframe> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
+        public void Write(AnimationCurve curve)
+        {
+            var keyframes = curve.keys;
+            Write(keyframes);
+            WriteEnum(curve.preWrapMode);
+            WriteEnum(curve.postWrapMode);
+        }
+
+        public void Write(IEnumerable<AnimationCurve> value)
+        {
+            if (value == null)
+            {
+                Write(0);
+                return;
+            }
+
+            if (value is not IReadOnlyCollection<AnimationCurve> valueArray) valueArray = value.ToArray();
+            Write(valueArray.Count);
+            foreach (var item in valueArray) Write(item);
+        }
+
         /// <summary>Adds a JToken to the packet.</summary>
         /// <param name="value">The JToken key to add.</param>
         /// <param name="compress">Whether to compress the json before writing it.</param>
@@ -1215,6 +1259,67 @@ namespace MultiplayerProtocol
 
             var result = new Vector4[length];
             for (var i = 0; i < length; i++) result[i] = ReadVector4();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
+        public Keyframe ReadKeyframe(bool moveReadPos = true)
+        {
+            var readPos = _readPos;
+            var time = ReadFloat();
+            var value = ReadFloat();
+            var inTangent = ReadFloat();
+            var outTangent = ReadFloat();
+            var inWeight = ReadFloat();
+            var outWeight = ReadFloat();
+            if (!moveReadPos) _readPos = readPos;
+            return new Keyframe(time, value, inTangent, outTangent, inWeight, outWeight);
+        }
+
+        public Keyframe[] ReadKeyframes(bool moveReadPos = true)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<Keyframe>();
+            }
+
+            var result = new Keyframe[length];
+            for (var i = 0; i < length; i++) result[i] = ReadKeyframe();
+            if (!moveReadPos) _readPos = position;
+            return result;
+        }
+
+        public AnimationCurve ReadAnimationCurve(bool moveReadPos = true)
+        {
+            var readPos = _readPos;
+            var keyframes = ReadKeyframes(moveReadPos);
+            var preWrapMode = ReadEnum<WrapMode>();
+            var postWrapMode = ReadEnum<WrapMode>();
+
+            if (!moveReadPos) _readPos = readPos;
+
+            return new AnimationCurve(keyframes)
+            {
+                preWrapMode = preWrapMode,
+                postWrapMode = postWrapMode
+            };
+        }
+
+        public AnimationCurve[] ReadAnimationCurves(bool moveReadPos = true)
+        {
+            var position = _readPos;
+            var length = ReadInt();
+            if (length == 0)
+            {
+                if (!moveReadPos) _readPos = position;
+                return Array.Empty<AnimationCurve>();
+            }
+
+            var result = new AnimationCurve[length];
+            for (var i = 0; i < length; i++) result[i] = ReadAnimationCurve();
             if (!moveReadPos) _readPos = position;
             return result;
         }
