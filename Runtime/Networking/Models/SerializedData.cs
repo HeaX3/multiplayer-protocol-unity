@@ -1060,7 +1060,7 @@ namespace MultiplayerProtocol
 
             var dateData = ReadLong();
             if (!moveReadPos) _readPos = readPos;
-            if (dateData < DateTime.MinValue.Ticks)
+            if (dateData <= DateTime.MinValue.Ticks || dateData >= DateTime.MaxValue.Ticks)
             {
                 Debug.LogWarning("DateTime value was unexpectedly below the minimum value: " + dateData);
                 return default;
