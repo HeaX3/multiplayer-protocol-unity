@@ -347,8 +347,6 @@ namespace MultiplayerProtocol
         /// <param name="value">The date time to add.</param>
         public void Write(DateTime value)
         {
-            Write(value != default);
-            if (value == default) return;
             Write(value.ToBinary());
         }
 
@@ -562,10 +560,18 @@ namespace MultiplayerProtocol
             foreach (var item in valueArray) Write(item);
         }
 
-        /// <summary>Adds a JToken to the packet.</summary>
-        /// <param name="value">The JToken key to add.</param>
+        /// <summary>Adds a JObject to the packet.</summary>
+        /// <param name="value">The JObject key to add.</param>
         /// <param name="compress">Whether to compress the json before writing it.</param>
-        public void Write(JToken value, bool compress = false)
+        public void Write(JObject value, bool compress = false)
+        {
+            Write(value != null && compress ? GZipCompressor.CompressString(value.ToString()) : value?.ToString());
+        }
+
+        /// <summary>Adds a JArray to the packet.</summary>
+        /// <param name="value">The JArray key to add.</param>
+        /// <param name="compress">Whether to compress the json before writing it.</param>
+        public void Write(JArray value, bool compress = false)
         {
             Write(value != null && compress ? GZipCompressor.CompressString(value.ToString()) : value?.ToString());
         }
@@ -1051,22 +1057,15 @@ namespace MultiplayerProtocol
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public DateTime ReadDateTime(bool moveReadPos = true)
         {
-            var readPos = _readPos;
-            if (!ReadBool())
-            {
-                if (!moveReadPos) _readPos = readPos;
-                return default;
-            }
-
-            var dateData = ReadLong();
-            if (!moveReadPos) _readPos = readPos;
+            var dateData = ReadLong(moveReadPos);
             try
             {
                 var result = DateTime.FromBinary(dateData);
                 return result;
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogError(e);
                 Debug.LogWarning("Unexpected DateTime value encountered, returning default instead");
                 return default;
             }
