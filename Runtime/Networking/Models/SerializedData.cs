@@ -1060,14 +1060,16 @@ namespace MultiplayerProtocol
 
             var dateData = ReadLong();
             if (!moveReadPos) _readPos = readPos;
-            if (dateData <= DateTime.MinValue.Ticks || dateData >= DateTime.MaxValue.Ticks)
+            try
             {
-                Debug.LogWarning("DateTime value was unexpectedly out of bounds: " + dateData);
+                var result = DateTime.FromBinary(dateData);
+                return result;
+            }
+            catch
+            {
+                Debug.LogWarning("Unexpected DateTime value encountered, returning default instead");
                 return default;
             }
-
-            var result = DateTime.FromBinary(dateData);
-            return result;
         }
 
         public DateTime[] ReadDateTimes(bool moveReadPos = true)
