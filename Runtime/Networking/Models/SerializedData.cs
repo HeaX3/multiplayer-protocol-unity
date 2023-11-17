@@ -1051,7 +1051,23 @@ namespace MultiplayerProtocol
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public DateTime ReadDateTime(bool moveReadPos = true)
         {
-            return ReadBool() ? DateTime.FromBinary(ReadLong(moveReadPos)) : default;
+            var readPos = _readPos;
+            if (!ReadBool())
+            {
+                if (!moveReadPos) _readPos = readPos;
+                return default;
+            }
+
+            var dateData = ReadLong();
+            if (!moveReadPos) _readPos = readPos;
+            if (dateData < DateTime.MinValue.Ticks)
+            {
+                Debug.LogWarning("DateTime value was unexpectedly below the minimum value: " + dateData);
+                return default;
+            }
+
+            var result = DateTime.FromBinary(dateData);
+            return result;
         }
 
         public DateTime[] ReadDateTimes(bool moveReadPos = true)
