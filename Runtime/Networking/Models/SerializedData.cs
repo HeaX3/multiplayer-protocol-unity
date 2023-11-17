@@ -349,7 +349,7 @@ namespace MultiplayerProtocol
         {
             Write(value != default);
             if (value == default) return;
-            Write((value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime()).ToBinary());
+            Write(value.ToBinary());
         }
 
         public void Write(IEnumerable<DateTime> value)
@@ -1062,7 +1062,7 @@ namespace MultiplayerProtocol
             if (!moveReadPos) _readPos = readPos;
             if (dateData <= DateTime.MinValue.Ticks || dateData >= DateTime.MaxValue.Ticks)
             {
-                Debug.LogWarning("DateTime value was unexpectedly below the minimum value: " + dateData);
+                Debug.LogWarning("DateTime value was unexpectedly out of bounds: " + dateData);
                 return default;
             }
 
