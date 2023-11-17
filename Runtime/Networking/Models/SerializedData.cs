@@ -347,6 +347,8 @@ namespace MultiplayerProtocol
         /// <param name="value">The date time to add.</param>
         public void Write(DateTime value)
         {
+            Write(value != default);
+            if (value == default) return;
             Write((value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime()).ToBinary());
         }
 
@@ -1049,7 +1051,7 @@ namespace MultiplayerProtocol
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public DateTime ReadDateTime(bool moveReadPos = true)
         {
-            return DateTime.FromBinary(ReadLong(moveReadPos));
+            return ReadBool() ? DateTime.FromBinary(ReadLong(moveReadPos)) : default;
         }
 
         public DateTime[] ReadDateTimes(bool moveReadPos = true)
