@@ -327,7 +327,7 @@ namespace MultiplayerProtocol
         /// <param name="value">The guid to add.</param>
         public void Write(Guid value)
         {
-            Write(value.ToString());
+            Write(value.ToByteArray());
         }
 
         public void Write(IEnumerable<Guid> value)
@@ -1033,8 +1033,7 @@ namespace MultiplayerProtocol
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public Guid ReadGuid(bool moveReadPos = true)
         {
-            var stringValue = ReadString(moveReadPos);
-            return stringValue != null && Guid.TryParse(stringValue, out var result) ? result : default;
+            return new Guid(ReadBytes(16, moveReadPos)); // Guid always serialize to 16 bytes
         }
 
         public Guid[] ReadGuids(bool moveReadPos = true)
