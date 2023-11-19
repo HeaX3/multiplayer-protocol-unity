@@ -15,34 +15,12 @@ namespace MultiplayerProtocol.Senders
             this.connection = connection;
         }
 
-        public IPromise SendRequest<T>(
-            [NotNull] T message,
+        public RequestPromise SendRequest(
+            [NotNull] INetworkMessage message,
             uint timeoutMs = 5000
         )
-            where T : INetworkMessage
         {
-            return SendRequest(message, null, null, timeoutMs);
-        }
-
-        public IPromise SendRequest<T>(
-            [NotNull] T message,
-            Action responseHandler,
-            uint timeoutMs = 5000
-        )
-            where T : INetworkMessage
-        {
-            return SendRequest(message, responseHandler, null, timeoutMs);
-        }
-
-        public IPromise SendRequest<T>(
-            [NotNull] T message,
-            Action responseHandler,
-            Action<Exception> errorHandler,
-            uint timeoutMs = 5000
-        )
-            where T : INetworkMessage
-        {
-            return new Promise((resolve, reject) =>
+            return new RequestPromise((successHandler, reject, resolve) =>
             {
                 if (!protocol.TryGetPartnerMessageId(message.GetType(), out var messageId))
                 {
@@ -56,8 +34,7 @@ namespace MultiplayerProtocol.Senders
                     // Debug.Log("Response has pre response messages: " + (response.preResponse.value?.Length > 0 ? "yes" : "no"));
                     // Debug.Log("Response has post response messages: " + (response.postResponse.value?.Length > 0 ? "yes" : "no"));
                     if (response.preResponse?.value != null) protocol.Handle(response.preResponse);
-                    if (!response.isError && responseHandler != null) responseHandler();
-                    else if (response.isError && errorHandler != null) errorHandler(response.error());
+                    if (!response.isError && successHandler != null) successHandler();
                     if (response.postResponse?.value != null) protocol.Handle(response.postResponse);
                     if (!response.isError) resolve();
                     else reject(response.error());
@@ -66,27 +43,12 @@ namespace MultiplayerProtocol.Senders
             });
         }
 
-        public IPromise SendRequest<TMessage, TResponse>(
-            [NotNull] TMessage message,
-            Action<TResponse> responseHandler,
-            uint timeoutMs = 5000
+        public RequestPromise<TResponse> SendRequest<TResponse>(
+            [NotNull] INetworkMessage message, uint timeoutMs = 5000
         )
-            where TMessage : INetworkMessage
             where TResponse : ISerializableValue, new()
         {
-            return SendRequest(message, responseHandler, null, timeoutMs);
-        }
-
-        public IPromise SendRequest<TMessage, TResponse>(
-            [NotNull] TMessage message,
-            Action<TResponse> responseHandler,
-            Action<Exception> errorHandler,
-            uint timeoutMs = 5000
-        )
-            where TMessage : INetworkMessage
-            where TResponse : ISerializableValue, new()
-        {
-            return new Promise((resolve, reject) =>
+            return new RequestPromise<TResponse>((resultHandler, reject, resolve) =>
             {
                 if (!protocol.TryGetPartnerMessageId(message.GetType(), out var messageId))
                 {
@@ -98,8 +60,7 @@ namespace MultiplayerProtocol.Senders
                 protocol.AddResponseListener(requestMessage.requestId, timeoutMs, response =>
                 {
                     if (response.preResponse?.value != null) protocol.Handle(response.preResponse);
-                    if (!response.isError) responseHandler(response.value<TResponse>());
-                    else if (errorHandler != null) errorHandler(response.error());
+                    if (!response.isError) resultHandler(response.value<TResponse>());
                     if (response.postResponse?.value != null) protocol.Handle(response.postResponse);
                     if (!response.isError) resolve();
                     else reject(response.error());

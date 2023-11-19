@@ -54,7 +54,13 @@ namespace MultiplayerProtocol
         /// </summary>
         public IPromise PerformProtocolHandshake()
         {
-            return protocolSender.SendProtocol();
+            return new Promise((resolve, reject) =>
+            {
+                protocolSender.SendProtocol()
+                    .ThenAccept(response => protocol.Handle(response))
+                    .Then(resolve)
+                    .Catch(reject);
+            });
         }
 
         /// <summary>
@@ -98,46 +104,18 @@ namespace MultiplayerProtocol
             endpoint.Send(message);
         }
 
-        public IPromise SendRequest<T>(
-            [NotNull] T message,
+        public RequestPromise SendRequest(
+            [NotNull] INetworkMessage message,
             uint timeoutMs = 5000
-        ) where T : INetworkMessage => sender.SendRequest(message, timeoutMs);
+        ) => sender.SendRequest(message, timeoutMs);
 
-
-        public IPromise SendRequest<T>(
-            [NotNull] T message,
-            Action responseHandler,
-            uint timeoutMs = 5000
-        ) where T : INetworkMessage => sender.SendRequest(message, responseHandler, timeoutMs);
-
-        public IPromise SendRequest<T>(
-            [NotNull] T message,
-            Action responseHandler,
-            Action<Exception> errorHandler,
-            uint timeoutMs = 5000
-        ) where T : INetworkMessage, new() => sender.SendRequest(message, timeoutMs);
-
-        public IPromise SendRequest<TMessage, TResponse>(
-            [NotNull] TMessage message,
-            Action<TResponse> responseHandler,
+        public RequestPromise<TResponse> SendRequest<TResponse>(
+            [NotNull] INetworkMessage message,
             uint timeoutMs = 5000
         )
-            where TMessage : INetworkMessage
             where TResponse : ISerializableValue, new()
         {
-            return sender.SendRequest(message, responseHandler, timeoutMs);
-        }
-
-        public IPromise SendRequest<TMessage, TResponse>(
-            [NotNull] TMessage message,
-            Action<TResponse> responseHandler,
-            Action<Exception> errorHandler,
-            uint timeoutMs = 5000
-        )
-            where TMessage : INetworkMessage
-            where TResponse : ISerializableValue, new()
-        {
-            return sender.SendRequest(message, responseHandler, errorHandler, timeoutMs);
+            return sender.SendRequest<TResponse>(message, timeoutMs);
         }
 
         private void OnMessageReceived(SerializedData message)

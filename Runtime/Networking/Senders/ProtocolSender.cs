@@ -1,5 +1,4 @@
 ﻿using RSG;
-using UnityEngine;
 
 namespace MultiplayerProtocol.Senders
 {
@@ -9,14 +8,9 @@ namespace MultiplayerProtocol.Senders
         {
         }
 
-        public IPromise SendProtocol()
+        public RequestPromise<ProtocolResponseMessage> SendProtocol()
         {
-            return connection.SendRequest(
-                connection.protocol.CreateProtocolMessage(),
-                (ProtocolResponseMessage response) =>
-                {
-                    connection.protocol.Handle(response);
-                });
+            return connection.SendRequest<ProtocolResponseMessage>(connection.protocol.CreateProtocolMessage());
         }
     }
 }
