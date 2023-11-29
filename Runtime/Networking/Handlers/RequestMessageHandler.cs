@@ -18,41 +18,56 @@ namespace MultiplayerProtocol
             //               : "Unknown type"));
             var payload = protocol.Deserialize(message.message, message.messageId, out var handler);
             // Debug.Log(connection.protocol.name + ": Deserialized message is " + payload.GetType().Name);
-            if (handler is INetworkMessageHandler simpleHandler)
+            try
             {
-                simpleHandler.Handle(payload);
-            }
-            else if (handler is INetworkRequestHandler requestHandler)
-            {
-                var response = requestHandler.Handle(payload);
-                connection.responseSender.SendResponse(message.requestId, response);
-            }
-            else if (handler is IAsyncNetworkRequestHandler asyncHandler)
-            {
-                var timeout = TaskScheduler.RunLater(() => connection.responseSender.SendResponse(
-                    message.requestId,
-                    RequestResponse.RequestTimeout()
-                ), asyncHandler.maxTimeoutMs);
-
-                asyncHandler.Handle(payload).Then(response =>
+                switch (handler)
                 {
-                    if (timeout.isCancelled) return;
-                    timeout.Cancel();
-                    connection.responseSender.SendResponse(message.requestId, response);
-                }).Catch(e =>
-                {
-                    if (timeout.isCancelled)
+                    case INetworkMessageHandler simpleHandler:
+                        simpleHandler.Handle(payload);
+                        break;
+                    case INetworkRequestHandler requestHandler:
                     {
-                        Debug.LogError(handler.GetType().Name + " encountered error after time already ran out: " + e);
-                        return;
+                        var response = requestHandler.Handle(payload);
+                        connection.responseSender.SendResponse(message.requestId, response);
+                        break;
                     }
+                    case IAsyncNetworkRequestHandler asyncHandler:
+                    {
+                        var timeout = TaskScheduler.RunLater(() => connection.responseSender.SendResponse(
+                            message.requestId,
+                            RequestResponse.RequestTimeout()
+                        ), asyncHandler.maxTimeoutMs);
 
-                    timeout.Cancel();
-                    connection.responseSender.SendResponse(
-                        message.requestId,
-                        e as IRequestResponse ?? new RequestResponse(StatusCode.InternalServerError, e)
-                    );
-                });
+                        asyncHandler.Handle(payload).Then(response =>
+                        {
+                            if (timeout.isCancelled) return;
+                            timeout.Cancel();
+                            connection.responseSender.SendResponse(message.requestId, response);
+                        }).Catch(e =>
+                        {
+                            if (timeout.isCancelled)
+                            {
+                                Debug.LogError(handler.GetType().Name + " encountered error after time already ran out: " +
+                                               e);
+                                return;
+                            }
+
+                            timeout.Cancel();
+                            connection.responseSender.SendResponse(
+                                message.requestId,
+                                e as IRequestResponse ?? new RequestResponse(StatusCode.InternalServerError, e)
+                            );
+                        });
+                        break;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                connection.responseSender.SendResponse(
+                    message.requestId,
+                    e as IRequestResponse ?? new RequestResponse(StatusCode.InternalServerError, e)
+                );
             }
         }
 
