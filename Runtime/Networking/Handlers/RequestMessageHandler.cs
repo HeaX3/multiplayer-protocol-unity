@@ -65,19 +65,20 @@ namespace MultiplayerProtocol
             }
             catch (Exception e)
             {
-                if (e is not IRequestResponse)
+                if (e is IRequestResponse response)
                 {
-                    Debug.LogError("Error handling request of type " + payload.GetType().Name + ":");
-                    Debug.LogError(e);
                     connection.responseSender.SendResponse(
                         message.requestId,
-                        RequestResponse.InternalServerError()
+                        response
                     );
+                    return;
                 }
 
+                Debug.LogError("Error handling request of type " + payload.GetType().Name + ":");
+                Debug.LogError(e);
                 connection.responseSender.SendResponse(
                     message.requestId,
-                    e as IRequestResponse ?? new RequestResponse(StatusCode.InternalServerError, e)
+                    RequestResponse.InternalServerError()
                 );
             }
         }
