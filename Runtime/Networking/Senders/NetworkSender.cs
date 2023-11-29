@@ -28,11 +28,20 @@ namespace MultiplayerProtocol.Senders
                     return;
                 }
 
-                var requestMessage = new RequestMessage(messageId, message);
+                RequestMessage requestMessage;
+                try
+                {
+                    requestMessage = new RequestMessage(messageId, message);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Failed serializing message of type " + message.GetType().Name + ":\n" + e);
+                    reject(new BadRequestException("Unserializable input data"));
+                    return;
+                }
+
                 protocol.AddResponseListener(requestMessage.requestId, timeoutMs, response =>
                 {
-                    // Debug.Log("Response has pre response messages: " + (response.preResponse.value?.Length > 0 ? "yes" : "no"));
-                    // Debug.Log("Response has post response messages: " + (response.postResponse.value?.Length > 0 ? "yes" : "no"));
                     if (response.preResponse?.value != null) protocol.Handle(response.preResponse);
                     if (!response.isError && successHandler != null) successHandler();
                     if (response.postResponse?.value != null) protocol.Handle(response.postResponse);
@@ -56,7 +65,18 @@ namespace MultiplayerProtocol.Senders
                     return;
                 }
 
-                var requestMessage = new RequestMessage(messageId, message);
+                RequestMessage requestMessage;
+                try
+                {
+                    requestMessage = new RequestMessage(messageId, message);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Failed serializing message of type " + message.GetType().Name + ":\n" + e);
+                    reject(new BadRequestException("Unserializable input data"));
+                    return;
+                }
+
                 protocol.AddResponseListener(requestMessage.requestId, timeoutMs, response =>
                 {
                     if (response.preResponse?.value != null) protocol.Handle(response.preResponse);
