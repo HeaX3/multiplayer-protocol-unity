@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace MultiplayerProtocol
 {
@@ -15,7 +16,7 @@ namespace MultiplayerProtocol
 
         public byte[] ToBytes()
         {
-            return null;
+            return Encoding.UTF8.GetBytes(Message ?? GetType().Name);
         }
 
         protected RequestErrorResponse(string message) : base(message)
