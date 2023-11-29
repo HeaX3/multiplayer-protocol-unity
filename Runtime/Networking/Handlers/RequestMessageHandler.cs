@@ -47,7 +47,8 @@ namespace MultiplayerProtocol
                         {
                             if (timeout.isCancelled)
                             {
-                                Debug.LogError(handler.GetType().Name + " encountered error after time already ran out: " +
+                                Debug.LogError(handler.GetType().Name +
+                                               " encountered error after time already ran out: " +
                                                e);
                                 return;
                             }
@@ -64,6 +65,16 @@ namespace MultiplayerProtocol
             }
             catch (Exception e)
             {
+                if (e is not IRequestResponse)
+                {
+                    Debug.LogError("Error handling request of type " + payload.GetType().Name + ":");
+                    Debug.LogError(e);
+                    connection.responseSender.SendResponse(
+                        message.requestId,
+                        RequestResponse.InternalServerError()
+                    );
+                }
+
                 connection.responseSender.SendResponse(
                     message.requestId,
                     e as IRequestResponse ?? new RequestResponse(StatusCode.InternalServerError, e)
