@@ -90,7 +90,7 @@ namespace MultiplayerProtocol
                 throw new InvalidOperationException("Recipient cannot handle message of type " + type.Name);
             }
 
-            message.InsertInt(messageId);
+            message.InsertUShort(messageId);
             Send(message);
         }
 
