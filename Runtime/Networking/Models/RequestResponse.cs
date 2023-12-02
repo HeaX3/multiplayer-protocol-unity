@@ -82,25 +82,25 @@ namespace MultiplayerProtocol
             return result;
         }
 
-        RequestResponse PreResponse(Protocol protocol, params INetworkMessage[] messages)
+        public RequestResponse PreResponse(Protocol protocol, params INetworkMessage[] messages)
         {
             preResponse = protocol.Serialize(messages);
             return this;
         }
 
-        RequestResponse PreResponse(SerializedMessages value)
+        public RequestResponse PreResponse(SerializedMessages value)
         {
             preResponse = value;
             return this;
         }
 
-        RequestResponse PostResponse(Protocol protocol, params INetworkMessage[] messages)
+        public RequestResponse PostResponse(Protocol protocol, params INetworkMessage[] messages)
         {
             postResponse = protocol.Serialize(messages);
             return this;
         }
 
-        RequestResponse PostResponse(SerializedMessages value)
+        public RequestResponse PostResponse(SerializedMessages value)
         {
             postResponse = value;
             return this;
