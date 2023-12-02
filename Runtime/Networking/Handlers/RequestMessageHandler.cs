@@ -65,7 +65,7 @@ namespace MultiplayerProtocol
             }
             catch (Exception e)
             {
-                if (e is IRequestResponse response)
+                if (e is IRequestResponse response and not InternalServerErrorException)
                 {
                     connection.responseSender.SendResponse(
                         message.requestId,
