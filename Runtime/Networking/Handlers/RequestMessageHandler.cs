@@ -54,10 +54,7 @@ namespace MultiplayerProtocol
                             }
 
                             timeout.Cancel();
-                            connection.responseSender.SendResponse(
-                                message.requestId,
-                                e as IRequestResponse ?? new RequestResponse(StatusCode.InternalServerError, e)
-                            );
+                            HandleError(message.requestId, payload.GetType(), e);
                         });
                         break;
                     }
@@ -65,21 +62,7 @@ namespace MultiplayerProtocol
             }
             catch (Exception e)
             {
-                if (e is IRequestResponse response and not InternalServerErrorException)
-                {
-                    connection.responseSender.SendResponse(
-                        message.requestId,
-                        response
-                    );
-                    return;
-                }
-
-                Debug.LogError("Error handling request of type " + payload.GetType().Name + ":");
-                Debug.LogError(e);
-                connection.responseSender.SendResponse(
-                    message.requestId,
-                    RequestResponse.InternalServerError()
-                );
+                HandleError(message.requestId, payload.GetType(), e);
             }
         }
 
@@ -90,15 +73,26 @@ namespace MultiplayerProtocol
                 throw e;
             }
 
-            if (e is not RequestErrorResponse || e is InternalServerErrorException)
+            HandleError(request.requestId, request.GetType(), e);
+        }
+
+        private void HandleError(Guid requestId, Type messageType, Exception e)
+        {
+            if (e is IRequestResponse response and not InternalServerErrorException)
             {
-                Debug.LogError(e);
+                connection.responseSender.SendResponse(
+                    requestId,
+                    response
+                );
+                return;
             }
 
-            connection.Send(new ResponseMessage(
-                request.requestId,
-                e as RequestErrorResponse ?? (IRequestResponse)new RequestResponse(StatusCode.InternalServerError, e)
-            ));
+            Debug.LogError("Error handling request of type " + messageType.Name + ":");
+            Debug.LogError(e);
+            connection.responseSender.SendResponse(
+                requestId,
+                RequestResponse.InternalServerError()
+            );
         }
     }
 }
