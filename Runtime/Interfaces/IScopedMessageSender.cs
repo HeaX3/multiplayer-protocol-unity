@@ -8,14 +8,17 @@ namespace MultiplayerProtocol
     public interface IScopedMessageSender
     {
         IEnumerable<NetworkConnection> GetConnections();
-        
+
         void Send(INetworkMessage message)
         {
             var type = message.GetType();
-            var serialized = message.Serialize();
+            var serialized = message.Serialize().ToArray();
+            var instance = new SerializedData();
             foreach (var connection in GetConnections())
             {
-                connection.Send(type, serialized);
+                instance.Write(serialized);
+                connection.Send(type, instance);
+                instance.Reset();
             }
         }
     }

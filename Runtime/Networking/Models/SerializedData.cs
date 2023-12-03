@@ -594,7 +594,7 @@ namespace MultiplayerProtocol
 
         /// <summary>Adds a collection of serializable values to the packet.</summary>
         /// <param name="value">The serializable values to add.</param>
-        public void Write<T>([CanBeNull] IEnumerable<T> value) where T : ISerializableValue, new()
+        public void Write<T>([CanBeNull] [ItemCanBeNull] IEnumerable<T> value) where T : ISerializableValue, new()
         {
             if (value == null)
             {
@@ -1420,8 +1420,8 @@ namespace MultiplayerProtocol
                 return Array.Empty<T>();
             }
 
-            var rawLength = ReadInt();
-            var compressed = ReadBytes(rawLength);
+            var compressedLength = ReadInt();
+            var compressed = ReadBytes(compressedLength);
             var raw = new SerializedData(GZipCompressor.Decompress(compressed));
             var value = new T[length];
             for (var i = 0; i < length; i++)
