@@ -99,9 +99,10 @@ namespace MultiplayerProtocol
         /// message type id that the recipient understands.
         /// </summary>
         /// <param name="message">Serialized message preceded by the message id</param>
-        public void Send([NotNull] SerializedData message)
+        /// <param name="expiration">Cancel sending the message if it takes longer than this time to process previous messages</param>
+        public void Send([NotNull] SerializedData message, DateTime expiration = default)
         {
-            endpoint.Send(message);
+            endpoint.Send(message, expiration);
         }
 
         public RequestPromise SendRequest(
