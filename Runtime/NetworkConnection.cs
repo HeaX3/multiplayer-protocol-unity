@@ -67,9 +67,10 @@ namespace MultiplayerProtocol
         /// Serialize the network message and then send it
         /// </summary>
         /// <param name="message">Unserialized message</param>
-        public void Send([NotNull] INetworkMessage message)
+        /// <param name="expiration">Time after which this message will no longer be sent</param>
+        public void Send([NotNull] INetworkMessage message, DateTime expiration = default)
         {
-            Send(protocol.Serialize(message));
+            Send(protocol.Serialize(message), expiration);
         }
 
         /// <summary>
@@ -82,8 +83,9 @@ namespace MultiplayerProtocol
         /// </summary>
         /// <param name="type">Message type</param>
         /// <param name="message">Serialized message</param>
+        /// <param name="expiration">Time after which this message will no longer be sent</param>
         /// <exception cref="InvalidOperationException">Thrown if the recipient cannot handle the provided message type</exception>
-        public void Send([NotNull] Type type, [NotNull] SerializedData message)
+        public void Send([NotNull] Type type, [NotNull] SerializedData message, DateTime expiration = default)
         {
             if (!protocol.TryGetPartnerMessageId(type, out var messageId))
             {
@@ -91,7 +93,7 @@ namespace MultiplayerProtocol
             }
 
             message.InsertUShort(messageId);
-            Send(message);
+            Send(message, expiration);
         }
 
         /// <summary>

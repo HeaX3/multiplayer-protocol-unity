@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MultiplayerProtocol
 {
@@ -9,7 +10,9 @@ namespace MultiplayerProtocol
     {
         IEnumerable<NetworkConnection> GetConnections();
 
-        void Send(INetworkMessage message)
+        void Send(INetworkMessage message) => Send(message, default);
+        
+        void Send(INetworkMessage message, DateTime expiration)
         {
             var type = message.GetType();
             var serialized = message.Serialize().ToArray();
@@ -17,7 +20,7 @@ namespace MultiplayerProtocol
             foreach (var connection in GetConnections())
             {
                 instance.Write(serialized);
-                connection.Send(type, instance);
+                connection.Send(type, instance, expiration);
                 instance.Reset();
             }
         }
