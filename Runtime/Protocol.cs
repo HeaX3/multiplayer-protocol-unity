@@ -54,6 +54,18 @@ namespace MultiplayerProtocol
                 : DefaultTimeoutMs;
         }
 
+        public bool TryGetMessageType(ushort messageId, out string type)
+        {
+            if (!handlers.TryGetValue(messageId, out var handler))
+            {
+                type = default;
+                return false;
+            }
+
+            type = handler.messageType.Name;
+            return true;
+        }
+
         public bool IsThreadSafeMessage(ushort messageId) => threadSafeMessageIds.Contains(messageId);
 
         internal bool TryGetMessageId(Type type, out ushort messageId) => idMap.TryGetValue(type, out messageId);
