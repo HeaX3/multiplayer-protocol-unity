@@ -21,6 +21,8 @@ namespace MultiplayerProtocol
 
         private Protocol _protocol;
 
+        public bool isOpen => endpoint.isOpen;
+
         public Protocol protocol
         {
             get

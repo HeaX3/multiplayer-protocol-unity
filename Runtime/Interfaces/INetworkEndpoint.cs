@@ -9,6 +9,8 @@ namespace MultiplayerProtocol
 
         public event MessageEvent received;
         public event CloseEvent closed;
+        
+        public bool isOpen { get; }
 
         public void Send(SerializedData message) => Send(message, default);
         public void Send(SerializedData message, DateTime expiration);
