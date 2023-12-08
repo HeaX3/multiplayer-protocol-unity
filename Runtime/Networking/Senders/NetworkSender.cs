@@ -1,6 +1,5 @@
 ﻿using System;
 using JetBrains.Annotations;
-using RSG;
 using UnityEngine;
 
 namespace MultiplayerProtocol.Senders
@@ -42,11 +41,64 @@ namespace MultiplayerProtocol.Senders
 
                 protocol.AddResponseListener(requestMessage.requestId, timeoutMs, response =>
                 {
-                    if (response.preResponse?.value != null) protocol.Handle(response.preResponse);
-                    if (!response.isError && successHandler != null) successHandler();
-                    if (response.postResponse?.value != null) protocol.Handle(response.postResponse);
-                    if (!response.isError) resolve();
-                    else reject(response.error());
+                    if (response.preResponse?.value != null)
+                    {
+                        try
+                        {
+                            protocol.Handle(response.preResponse);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError(e);
+                        }
+                    }
+
+                    if (!response.isError && successHandler != null)
+                    {
+                        try
+                        {
+                            successHandler();
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError(e);
+                        }
+                    }
+
+                    if (response.postResponse?.value != null)
+                    {
+                        try
+                        {
+                            protocol.Handle(response.postResponse);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError(e);
+                        }
+                    }
+
+                    if (!response.isError)
+                    {
+                        try
+                        {
+                            resolve();
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError(e);
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            reject(response.error());
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError(e);
+                        }
+                    }
                 });
                 connection.Send(requestMessage);
             });
